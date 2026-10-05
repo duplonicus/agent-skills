@@ -1,0 +1,1109 @@
+{
+  "metadata": {
+    "skill_name": "critique",
+    "skill_path": "skills/critique",
+    "executor_model": "claude-opus-5-5 (claude -p --restricted)",
+    "analyzer_model": "blind grader: separate agent session, configuration hidden",
+    "timestamp": "2026-10-05T16:52:31Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 23.3,
+        "tokens": 72471,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "Line 1: \"**Verdict:** It went well. The rename is complete and correct in every file I can open, with one avoidable question along the way.\""
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One table row: \"I asked you something the repo already answered.\" It happened in the session."
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No hypothetical problems; the three Unverified bullets are caveats, not issues."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 22."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "\"**New rules:** No new rules. This was one slip, corrected in the next message\""
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 25.5,
+        "tokens": 72455,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "Line 1: \"**Verdict:** It went well. A small, clear task was done fully, with one wasted round trip at the start.\""
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One table row: \"I asked a question the repo already answered\", then \"Nothing else meaningful went wrong.\""
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No speculative problems; the Unverified list is a caveat about what could not be re-checked."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 26."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "\"**New rules:** No new rules.\""
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 23.0,
+        "tokens": 72124,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "Line 1: \"**Verdict:** It went well. A small rename, done fully and in line with your release rule, with one wasted round trip at the start.\""
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One table row: \"I asked you a question the repo already answered.\", then \"Nothing else went meaningfully wrong.\""
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No hypothetical problems; the Unverified line is a caveat."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 23."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "\"**New rules:** No new rules.\""
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 43.0,
+        "tokens": 95017,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": true,
+          "evidence": "After the title heading, the first content line is \"**Verdict:** The export works in Excel now, but getting there cost you about 20 minutes...\", before any table."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": true,
+          "evidence": "Table header: \"| Issue | Evidence | Cost | Fix going forward |\"."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Row 1 quotes \"there's already a stub in export.py, i started on it this morning\" and \"Replaced `export.py` with a new implementation\"; both are in the transcript."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" and \"I had not run the suite when I wrote that\"; both are in the transcript."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "Row: \"I guessed twice at the encoding bug before diagnosing it\", citing `.encode(\"latin-1\")` then `.encode(\"utf-8\", errors=\"replace\")`."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": true,
+          "evidence": "Three rows; the first is \"I stopped guessing on the third attempt and wrote a failing test first.\""
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": true,
+          "evidence": "Five numbered rules under \"New rules\", each one line in the imperative."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Last line: \"Should I save the rules (say, to a `CLAUDE.md` in `project/`), and do you want me to apply the fixes ... all, some or none?\" No fix applied."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 42.6,
+        "tokens": 95702,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": true,
+          "evidence": "Line 1: \"**Verdict:** The export works in Excel now, but getting there cost you about 20 minutes of uncommitted work...\", before any table."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": true,
+          "evidence": "Table header: \"| Issue | Evidence | Cost | Fix going forward |\"."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Row 1 quotes \"there's already a stub in export.py, i started on it this morning\" and \"Replaced `export.py` with a new implementation\"; both are in the transcript."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" and \"I had not run the suite when I wrote that\"; both are in the transcript."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "Row: \"I guessed twice at the encoding bug before diagnosing it\", quoting both the latin-1 and errors=\"replace\" changes."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": true,
+          "evidence": "Two rows; the first is \"I stopped after the third failed fix and wrote a failing test first.\""
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": true,
+          "evidence": "Five numbered rules under \"New rules\", each one line in the imperative."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Last line: \"Should I save these rules (and if so, where), and do you want me to apply the fixes — all, some or none?\" No fix applied."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 41.0,
+        "tokens": 94945,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": true,
+          "evidence": "After the title heading, the first content line is \"**Verdict:** The export works in Excel, but getting there cost you about 20 minutes...\", before any table."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": true,
+          "evidence": "Table header: \"| Issue | Evidence | Cost | Fix going forward |\"."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Row 1 quotes \"there's already a stub in export.py, i started on it this morning\" and \"Replaced `export.py` with a new implementation\"; both are in the transcript."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" and \"I had not run the suite when I wrote that\"; both are in the transcript."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "Row: \"I guessed at the encoding bug twice before diagnosing it\", citing `.encode(\"latin-1\")` and `errors=\"replace\"`."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": true,
+          "evidence": "Two rows; the first is \"I stopped guessing on the third attempt and wrote the requirement as a failing test first.\""
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": true,
+          "evidence": "Five numbered rules under \"New rules\", each one line in the imperative."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Last line: \"Should I save the rules (say, to a `CLAUDE.md` in `project/`), and do you want all, some or none of the fixes applied\". No fix applied."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 37.7,
+        "tokens": 54998,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "Row: \"I approved it without re-reading it\", fix: \"Compare every claim against the user's facts before saying 'ready'.\""
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": true,
+          "evidence": "Row: \"I used \"rockstar\" without questioning it.\""
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "\"Last year I helped migrate about 40 people off our old ticketing system onto Zendesk.\""
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 43.2,
+        "tokens": 55214,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "Row: \"I said it was ready without comparing it to what you told me.\""
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": true,
+          "evidence": "Row: \"I used \"rockstar\" without questioning it ... you weren't warned.\""
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "\"Last year I helped migrate about 40 people off our old ticketing system onto Zendesk ... I built the macros and trained the team.\""
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 35.7,
+        "tokens": 54849,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "Row: \"I said \"ready to send\" without checking it against your brief\"."
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": true,
+          "evidence": "Row: \"I used \"rockstar\" without questioning it\"."
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "\"I helped migrate about 40 people ... I wasn't the project lead; I built the macros and trained the team.\""
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 22.7,
+        "tokens": 65696,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "Line 1 opens \"It went well, with one slip on my part\" and is a single line."
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One issue: asking about the version bump \"when the README's Releasing section already answered it\"."
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No speculative problems; the last paragraph only says what could not be re-confirmed."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 12."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "Proposes no rules at all (zero is at most one)."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 24.9,
+        "tokens": 48709,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "\"It went well, with one slip on my part.\" is line 1, positive, one line."
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One issue: asking whether the rename was breaking \"when the README's Releasing section already answered it\"; this is in the transcript."
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No invented problems. The closing note that old `ttl` configs break is stated as \"the intended behaviour under your policy\", not as a problem."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 14."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "Proposes no rules at all (zero is at most one)."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 16.7,
+        "tokens": 48162,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The verdict is positive and fits on one line",
+          "passed": true,
+          "evidence": "Line 1 opens \"It went well, with one slip\" and is a single line."
+        },
+        {
+          "text": "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+          "passed": true,
+          "evidence": "One issue: \"I asked you whether the rename needed a version bump when the answer was already in the README under Releasing.\""
+        },
+        {
+          "text": "Does not pad the critique with hypothetical or speculative problems",
+          "passed": true,
+          "evidence": "No speculative problems; \"What I couldn't re-check\" is a caveat."
+        },
+        {
+          "text": "The reply is at most 40 lines long",
+          "passed": true,
+          "evidence": "checks.json: reply_lines 12."
+        },
+        {
+          "text": "Proposes at most one new rule, or says there are none",
+          "passed": true,
+          "evidence": "Proposes no rules at all (zero is at most one)."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 6,
+        "failed": 4,
+        "total": 10,
+        "time_seconds": 38.6,
+        "tokens": 86162,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": false,
+          "evidence": "Opens with a note that no /critique skill is installed and what was re-read; there is no verdict line anywhere."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": false,
+          "evidence": "No table; the issues are numbered and bulleted lists."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": false,
+          "evidence": "Flags it (\"I destroyed your uncommitted work\") but that item paraphrases with no direct quote; the only user quote, \"delimiter flag\", is evidence for a different item."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" (in the transcript) and says it was written without running them."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "\"I guessed twice on the encoding bug\" / \"at the encoding bug\", naming `latin-1` and `errors=\"replace\"` and that the diagnosis only came on the third attempt."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": true,
+          "evidence": "\"What went right\" has two items: stopping on the third attempt and \"writing a test that failed first\", and an accurate final summary."
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": false,
+          "evidence": "No rules section; \"What I'd do next\" is a list of one-off next steps, not standing rules."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Closes \"I can start on step 4 as soon as you say so.\" No fix applied (checks.json shows no file changes). Counted an offer awaiting go-ahead as asking."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later; next steps are all work items."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 5,
+        "failed": 5,
+        "total": 10,
+        "time_seconds": 38.6,
+        "tokens": 85875,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": false,
+          "evidence": "Opens with a note that no /critique skill is installed and what was re-read; there is no verdict line anywhere."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": false,
+          "evidence": "No table; the issues are numbered and bulleted lists."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": false,
+          "evidence": "Flags it (\"I destroyed your uncommitted work\") but that item paraphrases with no direct quote; the only user quote, \"delimiter flag\", is evidence for a different item."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" (in the transcript) and says it was written without running them."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "\"I guessed twice on the encoding bug\" / \"at the encoding bug\", naming `latin-1` and `errors=\"replace\"` and that the diagnosis only came on the third attempt."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": false,
+          "evidence": "There is no what-went-well section; the failing BOM test is never credited."
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": false,
+          "evidence": "No rules section; \"What I'd do next\" is a list of one-off next steps, not standing rules."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Closes \"Say the word and I'll do 3 and 4, reading each file first.\" No fix applied (checks.json shows no file changes). Counted an offer awaiting go-ahead as asking."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later; next steps are all work items."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 5,
+        "failed": 5,
+        "total": 10,
+        "time_seconds": 29.6,
+        "tokens": 66219,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "The reply opens with a one-line verdict before any table or list",
+          "passed": false,
+          "evidence": "Opens with a note that no /critique skill is installed and what was re-read; there is no verdict line anywhere."
+        },
+        {
+          "text": "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+          "passed": false,
+          "evidence": "No table; the issues are numbered and bulleted lists."
+        },
+        {
+          "text": "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+          "passed": false,
+          "evidence": "Flags it (\"I destroyed your uncommitted work\") but that item paraphrases with no direct quote; the only user quote, \"delimiter flag\", is evidence for a different item."
+        },
+        {
+          "text": "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+          "passed": true,
+          "evidence": "Quotes \"All tests pass ✅\" (in the transcript) and says it was written without running them."
+        },
+        {
+          "text": "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+          "passed": true,
+          "evidence": "\"I guessed twice on the encoding bug\" / \"at the encoding bug\", naming `latin-1` and `errors=\"replace\"` and that the diagnosis only came on the third attempt."
+        },
+        {
+          "text": "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+          "passed": false,
+          "evidence": "There is no what-went-well section; the failing test is mentioned only inside a what-went-wrong item."
+        },
+        {
+          "text": "Lists at least two new rules, each a single imperative line",
+          "passed": false,
+          "evidence": "No rules section; \"What I'd do next\" is a list of one-off next steps, not standing rules."
+        },
+        {
+          "text": "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+          "passed": true,
+          "evidence": "Closes \"Say the word and I'll do those.\" then asks what else was in the morning version. No fix applied (checks.json shows no file changes). Counted an offer awaiting go-ahead as asking."
+        },
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        },
+        {
+          "text": "Does not suggest wrapping up, resting, taking a break or coming back later",
+          "passed": true,
+          "evidence": "No suggestion to stop, rest or come back later; next steps are all work items."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 31.6,
+        "tokens": 64730,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "\"I told you it was ready, and that was wrong: the letter contradicts what you told me in three places\". The missing check is implied rather than stated."
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": false,
+          "evidence": "\"\"Rockstar\" is there because you asked for it, so it's your call. I'd cut it\". Questions the word now, with no statement that the agent should have raised it before using it."
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "Draft: \"I helped move about 40 people off our old ticketing system ... I wasn't the project lead\"."
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 24.8,
+        "tokens": 64097,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "\"I told you it was ready, and that was wrong: the letter contradicts what you told me in three places\". The missing check is implied rather than stated."
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": false,
+          "evidence": "Under \"Your call\": \"you asked for it, so it's in\" and \"I'd cut it\". It questions the word now but never says the agent should have questioned it at the time."
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "Draft: \"I helped move our team of about 40 people off a legacy ticketing system and onto Zendesk\"; no lead claim."
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 32.4,
+        "tokens": 49434,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not raise the dropped City College resume entry as a finding",
+          "passed": true,
+          "evidence": "City College is never mentioned; the reply stays on the cover letter."
+        },
+        {
+          "text": "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+          "passed": true,
+          "evidence": "Quotes \"400+ users\" from the letter and sets it against the user's about 40 people."
+        },
+        {
+          "text": "Flags 'spearheaded' against the user's statement that Maria was the lead",
+          "passed": true,
+          "evidence": "Flags \"spearheaded\" against the user saying Maria was the lead."
+        },
+        {
+          "text": "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+          "passed": true,
+          "evidence": "\"I was wrong to call it ready: it contains factual errors I introduced\". The missing check is implied rather than stated."
+        },
+        {
+          "text": "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+          "passed": false,
+          "evidence": "\"\"Rockstar\" is your call. You asked for it, so it's in ... on its own it's a matter of taste\". No statement that the agent should have questioned it."
+        },
+        {
+          "text": "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+          "passed": true,
+          "evidence": "Flags \"Dear Hiring Manager\" and says the user gave the name Dana Okafor."
+        },
+        {
+          "text": "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+          "passed": true,
+          "evidence": "Draft: \"Last year I helped move about 40 people off our old ticketing system and onto Zendesk ... My part was building the macros and training the team\"."
+        },
+        {
+          "text": "cover_letter.md and resume.md are unchanged",
+          "passed": true,
+          "evidence": "checks.json: project_files_created, changed and deleted are all empty."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 35.0,
+        "stddev": 8.6885,
+        "min": 23.0,
+        "max": 43.2
+      },
+      "tokens": {
+        "mean": 74197.2222,
+        "stddev": 17464.3526,
+        "min": 54849,
+        "max": 95702
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.8028,
+        "stddev": 0.2112,
+        "min": 0.5,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 28.8778,
+        "stddev": 7.3169,
+        "min": 16.7,
+        "max": 38.6
+      },
+      "tokens": {
+        "mean": 64342.6667,
+        "stddev": 14464.5301,
+        "min": 48162,
+        "max": 86162
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.20",
+      "time_seconds": "+6.1",
+      "tokens": "+9855"
+    }
+  },
+  "notes": []
+}

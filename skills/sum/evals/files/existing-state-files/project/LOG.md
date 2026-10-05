@@ -1,0 +1,3 @@
+- 2026-03-09 · Claude Code (laptop) · fx-service · added /health endpoint and smoke test script
+- 2026-03-11 · Claude Code (desktop) · fx-service · deployed v0.8.2 to staging; production left on v0.8.1
+- 2026-03-12 · Claude Code (laptop) · fx-service · logged FIN-212 rounding bug, added runbook section 4 (password rotation)

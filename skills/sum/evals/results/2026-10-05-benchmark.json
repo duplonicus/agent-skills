@@ -1,0 +1,1109 @@
+{
+  "metadata": {
+    "skill_name": "sum",
+    "skill_path": "skills/sum",
+    "executor_model": "claude-opus-5-5 (claude -p --restricted)",
+    "analyzer_model": "blind grader: separate agent session, configuration hidden",
+    "timestamp": "2026-10-05T16:52:31Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 36.3,
+        "tokens": 101672,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'Last actual pytest run: **14 passed, 1 failed** ... the suite has **not been re-run since**'; fix 'not verified'."
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 4: 'Rotate the staging database password by **2026-03-20** (Priya's deadline). Nobody has started.'"
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 30."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not go back to floats ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'Branch fix/rounding, **nothing committed**'; 'Nothing deployed from this branch.'"
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md has 2 non-blank prose lines (4 counting blanks) outside the code block, and the block reads 'Read project/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 35.2,
+        "tokens": 80092,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'last actual pytest run was 14 passed, 1 failed ... the suite has **not been re-run**. Green is expected but unverified.'"
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 4: 'Rotate the staging database password. Due 2026-03-20 (Priya); nobody has started.'"
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 31."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not go back to floats in convert() ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'fix is written on branch fix/rounding, **uncommitted**'; 'Nothing from this branch is deployed.'"
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md has 2 non-blank prose lines (4 lines counting blanks) outside the code block, and the block reads 'Read project/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 37.0,
+        "tokens": 101496,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'last actual pytest run was 14 passed, 1 failed ... the suite has **not been re-run**, so green is expected but unverified.'"
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 4: 'Rotate the staging database password, due 2026-03-20 (Priya). Nobody has started'."
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 30."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not go back to floats in convert() ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'fix written on branch fix/rounding, **uncommitted**'; 'Nothing from this branch is deployed.'"
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md has 3 non-blank prose lines (6 counting blanks) outside the code block, and the block reads 'Read project/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 33.4,
+        "tokens": 97911,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude (desktop app) | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md line 6: 'Nothing has been done in Buttondown yet: no import, no scheduled send, no DNS records.'"
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md Next 5: 'Schedule the welcome email for Tuesday 2026-05-12 at 09:00'."
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not import before DNS is verified.' and 'Do not cancel Mailchimp until the first Buttondown send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Subject line not chosen'; 'must fall back to \"there\" for the 37 rows with no first_name'."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 33."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md: 'I created docs/state/NOW.md (current state) and docs/state/LOG.md' plus code block 'Read docs/state/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 30.8,
+        "tokens": 77229,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude (desktop app) | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md: 'Subscriber import into Buttondown: not done (file prepared, not uploaded).' and 'Welcome send: not scheduled.'"
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md: 'Target is Tuesday 2026-05-12, 09:00 [user]'s local time.'"
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not import before DNS is verified.' and 'Do not cancel Mailchimp before the first Buttondown send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Subject line not chosen'; '37 with an empty first_name'; 'set the fallback to \"there\" for the 37 blank names'."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 36."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md: 'I created docs/state/NOW.md (current state) and docs/state/LOG.md' plus code block 'Read docs/state/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 32.1,
+        "tokens": 77347,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude (desktop app) | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md: 'Import to Buttondown: file prepared, NOT uploaded.' and 'Welcome send: NOT scheduled in Buttondown.'"
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md Next 5: 'Schedule the welcome email for Tuesday 2026-05-12 at 09:00'."
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Order is strict: DNS verified, then import, then schedule' and 'Do NOT cancel Mailchimp before the first Buttondown send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Subject line not chosen'; '2,140 rows, 37 with an empty first_name'; 'needs the fallback \"there\" (37 subscribers have no first name)'."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 34."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": true,
+          "evidence": "reply.md: 'I wrote the current state to project/docs/state/NOW.md and added one line to project/docs/state/LOG.md' plus code block 'Read project/docs/state/NOW.md and continue.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 15.8,
+        "tokens": 34603,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 32 lines inside the fences (34 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block: 'The pages-per-week figure (31 to 9 over the quarter) is UNCONFIRMED' and 'Confirm with Tomás whether 31 pages per week was the peak week or the quarterly average'."
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min and 'No live demos: the organisers say the venue wifi is bad.'"
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'have it update ~/talks/pagerless/NOW.md and append a line to LOG.md'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 14.8,
+        "tokens": 34519,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 32 lines inside the fences (34 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block: 'The 31 to 9 pages-per-week figure is unconfirmed' and 'Confirm with Tomás whether 31 pages per week was the quarterly average or the peak week'."
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min and 'Organisers said no live demos because the venue wifi is bad, so use screenshots only.'"
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'have it update ~/talks/pagerless/NOW.md and append a line to ~/talks/pagerless/LOG.md from this block'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 16.0,
+        "tokens": 34593,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 32 lines inside the fences (34 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block: 'Confirm with Tomás whether 31 pages per week was the peak week or the quarterly average. **Unverified.**' and '\"31 to 9 over the quarter\" is unconfirmed'."
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min and 'No live demos, so use screenshots only.'"
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'once a session can reach ~/talks/pagerless/, paste this block in and have it update NOW.md ... and append one line to LOG.md'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8889,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "time_seconds": 41.7,
+        "tokens": 73982,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'Last actual pytest run: 14 passed, 1 failed ... The fixture was added afterwards ... the suite has **not been re-run since**'; fix described as 'not yet verified'."
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 3: 'Rotate the staging database password, due **2026-03-20**. Nobody has started.'"
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 30."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not move convert() back to floats ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'Nothing from fix/rounding is deployed'; 'Uncommitted on fix/rounding ...: app/rates.py, tests/conftest.py, .env.example'."
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md is 16 lines (10 non-blank) of prose and lists with no fenced code block at all."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.8889,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "time_seconds": 41.8,
+        "tokens": 93071,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'Last actual pytest run: 14 passed, 1 failed ... the suite has **not been re-run since**'; 'uncommitted and not verified'."
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 4: 'Rotate the staging database password by 2026-03-20'; State: 'not started by anyone ... Deadline is still 2026-03-20'."
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 31."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not move convert() back to floats ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'Nothing from fix/rounding is deployed'; 'Uncommitted on fix/rounding: app/rates.py (modified), tests/conftest.py (new), .env.example (new)'."
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md is 16 lines (14 non-blank) with no fenced code block."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.8889,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "time_seconds": 41.4,
+        "tokens": 93045,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+          "passed": true,
+          "evidence": "checks.json: changed = LOG.md, NOW.md; created = []; NOW.md header now 'Updated: 2026-03-14'."
+        },
+        {
+          "text": "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+          "passed": true,
+          "evidence": "NOW.md: 'Last actual pytest run was **before** the fixture was added: 14 passed, 1 failed ... The suite has not been re-run since.'"
+        },
+        {
+          "text": "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+          "passed": true,
+          "evidence": "NOW.md Next 4: 'Rotate the staging database password by 2026-03-20'; State: 'not started ... deadline is still 2026-03-20'."
+        },
+        {
+          "text": "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+          "passed": true,
+          "evidence": "grep for 'fx_live' and '9c2e7a41' across outputs/ (NOW.md, LOG.md, reply.md) returns 0 matches."
+        },
+        {
+          "text": "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+          "passed": true,
+          "evidence": "diff against original LOG.md shows only '3a4': one line added (2026-03-14 ...), first three lines identical."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l NOW.md = 31."
+        },
+        {
+          "text": "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+          "passed": true,
+          "evidence": "NOW.md Gotchas: 'Do not move convert() back to floats ... because the float product is already wrong before rounding.'"
+        },
+        {
+          "text": "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+          "passed": true,
+          "evidence": "NOW.md: 'Nothing from fix/rounding is deployed'; 'fix written on branch fix/rounding, **uncommitted and not verified**'."
+        },
+        {
+          "text": "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md is 17 lines (12 non-blank) with no fenced code block."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 35.6,
+        "tokens": 70143,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md table: 'Import into Buttondown | Not done.' and 'Welcome send | Not scheduled.'"
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md: 'planned for Tuesday 2026-05-12 at 09:00 the owner's local time'."
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md Decisions: 'Do not import until DNS is verified' and 'Keep Mailchimp as a fallback until the first Buttondown send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Subject line not chosen' and listed under Open questions; '37 rows have an empty first_name'; 'Greeting fallback for a missing first name is \"there\"'."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 43."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md names project/docs/state/NOW.md and LOG.md, but contains no fenced code block (0 ``` lines) and no next-session start line."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 37.0,
+        "tokens": 70532,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md line 11: 'No import, no scheduled send, no DNS records'; table rows 'Import into Buttondown | Not started' and 'Schedule the welcome send | Not started'."
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md: 'targeted for **Tuesday 2026-05-12 at 09:00**'."
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md: 'Do not import until DNS is verified.' and 'Keep Mailchimp active until the first Buttondown send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Subject line is undecided'; 'First-name fallback is \"there\". 37 of the 2,140 rows have an empty first_name.'"
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 44."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md names project/docs/state/NOW.md and LOG.md, but contains no fenced code block (grep for ``` finds 0) and no next-session start line."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 35.1,
+        "tokens": 69863,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+          "passed": true,
+          "evidence": "checks.json: created docs/state/LOG.md and docs/state/NOW.md only; nothing at project root."
+        },
+        {
+          "text": "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+          "passed": true,
+          "evidence": "LOG.md is one line: '2026-05-07 | Claude | ...' (date | who | summary)."
+        },
+        {
+          "text": "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+          "passed": true,
+          "evidence": "NOW.md line 5: 'Nothing has been changed in Buttondown or Mailchimp yet. No import, no scheduled send, no DNS records.'"
+        },
+        {
+          "text": "NOW.md gives the planned send as an absolute date, 2026-05-12",
+          "passed": true,
+          "evidence": "NOW.md step 5: 'Schedule the welcome email for Tuesday 2026-05-12 at 09:00 your time.'"
+        },
+        {
+          "text": "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+          "passed": true,
+          "evidence": "NOW.md Decisions: 'No import until the sending domain is verified.' and 'Mailchimp is not cancelled before the first send is confirmed delivered.'"
+        },
+        {
+          "text": "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+          "passed": true,
+          "evidence": "NOW.md: 'Pick the subject line. Still between ...'; 'Greeting fallback for a missing first name is \"there\"'; '37 rows have an empty first_name'."
+        },
+        {
+          "text": "NOW.md is at most 45 lines long",
+          "passed": true,
+          "evidence": "wc -l docs__state__NOW.md = 35."
+        },
+        {
+          "text": "The reply says where the state files were created and includes a code block with the line that starts the next session",
+          "passed": false,
+          "evidence": "reply.md names project/docs/state/NOW.md and LOG.md, but contains no fenced code block (0 ``` lines) and no next-session start line."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 15.5,
+        "tokens": 32115,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 31 lines inside the fences (33 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block: 'Pages per week 31 -> 9 over the quarter: UNCONFIRMED, 31 may be the peak week' and Next 1 'Check 31 -> 9 with Tomás'."
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min and 'No live demos (organisers: wifi is bad). Grafana demo is out'."
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'nothing has been saved to NOW.md or LOG.md. Paste the block below into your laptop session, which can file it in whatever format those files use' (folder ~/talks/pagerless/ named)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 13.4,
+        "tokens": 31915,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 24 lines inside the fences (26 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block: 'Pages per week 31 -> 9 over the quarter — UNCONFIRMED, 31 may be the peak week' and Next 1 'Confirm 31 -> 9 with Tomás'."
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min and 'No live demo (organisers: wifi is bad); Grafana demo is out'."
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'nothing is saved to NOW.md or LOG.md. Paste this into them, or hand it to the session that maintains them.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 14.1,
+        "tokens": 31955,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No project files were created, changed or deleted",
+          "passed": true,
+          "evidence": "checks.json: created, changed and deleted lists are all empty; outputs/ holds only reply.md."
+        },
+        {
+          "text": "The reply contains exactly one fenced code block, and the summary is inside it",
+          "passed": true,
+          "evidence": "reply.md has exactly 2 fence lines (one block) and the whole session summary sits between them."
+        },
+        {
+          "text": "The fenced block is at most 45 lines long",
+          "passed": true,
+          "evidence": "Counted 26 lines inside the fences (28 including the fence lines)."
+        },
+        {
+          "text": "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+          "passed": true,
+          "evidence": "Block section 'Unconfirmed': 'Pages per week 31 -> 9 over the quarter ... Check with Tomás.'"
+        },
+        {
+          "text": "The slides deadline is given as an absolute date, 2026-10-02",
+          "passed": true,
+          "evidence": "Block: 'due to (the) organisers Fri(day) 2026-10-02'."
+        },
+        {
+          "text": "The block includes the four-part outline with its timings and the no-live-demo constraint",
+          "passed": true,
+          "evidence": "Block lists 4 parts with 3/8/5/3 min (1 min slack) and 'No live demo (organisers: wifi is bad)'."
+        },
+        {
+          "text": "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary",
+          "passed": true,
+          "evidence": "Reply: 'nothing has been written to NOW.md or LOG.md. Paste the block below into the laptop session (or the files) when you're back' (folder ~/talks/pagerless/ named)."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 27.9333,
+        "stddev": 9.5038,
+        "min": 14.8,
+        "max": 37.0
+      },
+      "tokens": {
+        "mean": 71051.3333,
+        "stddev": 29021.0694,
+        "min": 34519,
+        "max": 101672
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.9213,
+        "stddev": 0.0593,
+        "min": 0.875,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 30.6222,
+        "stddev": 12.488,
+        "min": 13.4,
+        "max": 41.8
+      },
+      "tokens": {
+        "mean": 62957.8889,
+        "stddev": 24915.7635,
+        "min": 31915,
+        "max": 93071
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.08",
+      "time_seconds": "-2.7",
+      "tokens": "+8093"
+    }
+  },
+  "notes": []
+}

@@ -1,0 +1,63 @@
+{
+  "skill_name": "sum",
+  "evals": [
+    {
+      "id": 1,
+      "name": "existing-state-files",
+      "prompt": "ok i have to run. /sum",
+      "expected_output": "NOW.md rewritten with the true state (last test run was 14 passed, 1 failed; fixture added but suite not re-run), the other session's open item (password rotation by 2026-03-20) carried forward, one line appended to LOG.md, the pasted API token nowhere in any file, and a short reply with the line that starts the next session.",
+      "files": [
+        "evals/files/existing-state-files"
+      ],
+      "expectations": [
+        "project/NOW.md was rewritten in place, and no second state file was created anywhere else in the project",
+        "NOW.md does not claim the tests pass: it reports the last run as 14 passed and 1 failed, and says the suite was not re-run after the jpy_rate fixture was added",
+        "NOW.md still carries the staging database password rotation, due 2026-03-20, as an open item",
+        "The API token value fx_live_9c2e7a41b8d04f6e22ab appears in no project file and not in the reply",
+        "LOG.md has exactly one new line appended and its three existing lines are unchanged",
+        "NOW.md is at most 45 lines long",
+        "NOW.md records why the fix uses Decimal (the float product was already wrong before rounding), as a warning not to switch back",
+        "NOW.md says the work is uncommitted on branch fix/rounding and that nothing from it has been deployed",
+        "The reply is short (at most 8 lines outside code blocks) and includes a code block with the line that starts the next session"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "location-from-instructions",
+      "prompt": "ok thats all i have time for today. can you write down where we are so i can pick this up later",
+      "expected_output": "State files created where AGENTS.md says (docs/state/NOW.md and docs/state/LOG.md, pipe-separated log line), not at the project root. NOW.md records that nothing is imported or scheduled yet, the dependency order (DNS, verification, import, subject line, schedule), the send date as an absolute date (2026-05-12), and that Mailchimp stays until the first send is confirmed.",
+      "files": [
+        "evals/files/location-from-instructions"
+      ],
+      "expectations": [
+        "State files were created at docs/state/NOW.md and docs/state/LOG.md, and no NOW.md or LOG.md was created at the project root",
+        "The LOG.md line uses the format AGENTS.md specifies: YYYY-MM-DD | who | summary",
+        "NOW.md says the subscriber import has not been done and that nothing is scheduled in Buttondown",
+        "NOW.md gives the planned send as an absolute date, 2026-05-12",
+        "NOW.md records both ordering constraints: no import until DNS is verified, and Mailchimp is not cancelled until the first send is confirmed",
+        "NOW.md lists the undecided subject line and the 37 rows with an empty first name (fallback 'there')",
+        "NOW.md is at most 45 lines long",
+        "The reply says where the state files were created and includes a code block with the line that starts the next session"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "no-file-access-fallback",
+      "prompt": "my stop is coming up. /sum",
+      "harness_note": "In this scenario you are the phone chat assistant described in the transcript: you cannot read or write the user's files. Do not create or edit any files; your reply is the only output.",
+      "expected_output": "No files written. One fenced, paste-ready summary block with the talk's four-part outline and timings, the numbers (412 to 163 rules; 31 to 9 pages per week flagged as unconfirmed pending Tomás), the slides deadline as an absolute date (2026-10-02), the no-live-demo constraint, and a line saying which state files to update later.",
+      "files": [
+        "evals/files/no-file-access-fallback"
+      ],
+      "expectations": [
+        "No project files were created, changed or deleted",
+        "The reply contains exactly one fenced code block, and the summary is inside it",
+        "The fenced block is at most 45 lines long",
+        "The 31-to-9 pages-per-week figure is marked as unconfirmed, pending a check with Tomás",
+        "The slides deadline is given as an absolute date, 2026-10-02",
+        "The block includes the four-part outline with its timings and the no-live-demo constraint",
+        "The reply tells the user to update the NOW.md and LOG.md in their project folder from this summary"
+      ]
+    }
+  ]
+}

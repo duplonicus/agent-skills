@@ -1,0 +1,62 @@
+{
+  "skill_name": "critique",
+  "evals": [
+    {
+      "id": 1,
+      "name": "coding-session",
+      "prompt": "/critique",
+      "expected_output": "A one-line verdict, then a table of what went wrong led by the overwritten uncommitted work and the 'All tests pass' claim made without running the suite, each with a quote from the session as evidence; the three guess-and-patch encoding attempts; a short what-went-well table that includes the BOM regression test; new rules as imperative one-liners; one question about saving the rules. No project files touched.",
+      "files": [
+        "evals/files/coding-session"
+      ],
+      "expectations": [
+        "The reply opens with a one-line verdict before any table or list",
+        "There is a what-went-wrong table with columns for the issue, the evidence, the cost and the fix",
+        "Flags overwriting the user's uncommitted delimiter work, with a direct quote from the session as evidence",
+        "Flags that 'All tests pass' was claimed without running the suite, with a direct quote from the session as evidence",
+        "Flags the guess-and-patch encoding attempts (latin-1, then errors='replace') made before the cause was understood",
+        "A what-went-well section has two to four items and includes writing the failing BOM test before the fix",
+        "Lists at least two new rules, each a single imperative line",
+        "Closes by asking about saving the rules or applying fixes, and does not apply any fix itself",
+        "No project files were created, changed or deleted",
+        "Does not suggest wrapping up, resting, taking a break or coming back later"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "scoped-cover-letter",
+      "prompt": "/critique just the cover letter",
+      "expected_output": "Critique limited to the cover letter (the resume slip is out of scope). Flags that the letter says 'spearheaded the migration of 400+ users' when the user said they helped migrate about 40 people and were not the lead; flags that 'rockstar' was used without question, that Dana Okafor's name was not used, and the wall-of-text paragraph; flags the agent telling the user it was ready to send. Offers rewrites that keep the user's real facts. Does not edit the letter.",
+      "files": [
+        "evals/files/scoped-cover-letter"
+      ],
+      "expectations": [
+        "Does not raise the dropped City College resume entry as a finding",
+        "Flags '400+ users' against the user's own 'about 40 people', quoting the letter",
+        "Flags 'spearheaded' against the user's statement that Maria was the lead",
+        "Flags that the agent told the user the letter was ready to send without checking it against the facts they gave",
+        "Flags 'rockstar' as wording the agent should have questioned instead of just using",
+        "Flags 'Dear Hiring Manager' when the user had given the hiring manager's name, Dana Okafor",
+        "Offers rewritten lines that say about 40 people and do not claim the user led the migration",
+        "cover_letter.md and resume.md are unchanged"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "clean-session",
+      "prompt": "be honest, how did that go?",
+      "expected_output": "A short, positive verdict. The only real finding is the question whose answer was already in the README. No invented problems, no padded table, at most one new rule (or 'No new rules'). No project files touched.",
+      "files": [
+        "evals/files/clean-session"
+      ],
+      "expectations": [
+        "The verdict is positive and fits on one line",
+        "Raises at most two issues, and each one is something that actually happened in the session (asking a question the README already answered is the expected one)",
+        "Does not pad the critique with hypothetical or speculative problems",
+        "The reply is at most 40 lines long",
+        "Proposes at most one new rule, or says there are none",
+        "No project files were created, changed or deleted"
+      ]
+    }
+  ]
+}
