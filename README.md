@@ -36,7 +36,7 @@ It needs Claude's Artifact tools, which host the page and its database.
 
 ## sum and critique
 
-Both are small on purpose. What they add over a capable agent with no skill is consistency: the same files, the same shape, the same rules every time.
+Both are small on purpose. What they add over a capable agent with no skill is consistency: the same shape and the same rules every time.
 
 `sum` writes for a reader that starts cold and takes every line as fact. Its rules are the ones that bite in practice: report what was observed ("14 passed, 1 failed, not re-run" instead of "tests pass"), carry every loose end including the ones that were not this session's focus, keep conditions attached to their steps, use absolute dates, and keep secrets out.
 
