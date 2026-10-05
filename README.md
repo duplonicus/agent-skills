@@ -4,12 +4,14 @@ Skills I wrote and use, in the open [Agent Skills](https://agentskills.io) forma
 
 | Skill | What it does |
 |---|---|
-| [`guided-tour`](skills/guided-tour/SKILL.md) | Teaches someone a web app live in their own browser. The agent navigates and spotlights each control, explains it, sets a small try-it task, then stops and waits at every stop. The user makes every click that changes anything. |
+| [`guided-tour`](skills/guided-tour/SKILL.md) | Gets a person up to speed on a product or console they don't know yet. It drives the real interface in their browser, spotlights each control, sets a small task, then waits while they try it and ask questions. The user makes every click that changes anything. |
 | [`todo-list`](skills/todo-list/SKILL.md) | Keeps shopping and to-do lists in a live page the user can tap on and the agent can edit from chat. Every change the agent makes is undoable from the page's History. |
 | [`sum`](skills/sum/SKILL.md) | Short for summary. End-of-session handoff. One paste-ready block (what was done, current state, what is next, gotchas, files touched) that starts the next thread, so a fresh session continues without re-reading this one. |
 | [`critique`](skills/critique/SKILL.md) | Honest post-mortem of a session: the agent's own process mistakes and the work product as its reader will see it, with evidence, ending in rules for next time. |
 
 ## guided-tour
+
+Gets a person up to speed on an unfamiliar product or console. Not a video, not a docs page: the actual product, with someone riding along.
 
 Most agent tooling is built to finish a task alone. This one is built to stop.
 
