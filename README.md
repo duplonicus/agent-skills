@@ -36,8 +36,9 @@ I use the pair to move to a fresh session when the context window fills up:
 
 1. **`/critique`** while the whole session is still in view. The agent reviews its own work and proposes fixes and rules.
 2. **"Yes, fix it."** The fixes land in this session, where the agent still has the context to make them.
-3. **`/sum`** once the work is in its best state. The handoff describes the fixed version, not the flawed one.
-4. **New session.** Paste the block as the first message and carry on.
+3. **`/sum`** once the work is in its best state. The handoff describes the fixed version, not the flawed one. It comes back as a single code block.
+4. **Copy the block** with the code block's copy button.
+5. **New session.** Paste it as the first message and carry on.
 
 The order matters. A summary written before the critique hands the next session problems it has no context to find.
 
