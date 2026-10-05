@@ -22,7 +22,7 @@ The user wants the truth, not reassurance. A critique that only says nice things
 
 1. **Go back to the evidence.** Re-read the scoped part of the conversation and open every file it produced or changed. Memory of a session is a summary, and summaries flatter. Each finding needs a quote, a file and line, or a command result behind it.
 2. **Check what you can.** If a finding depends on something checkable (did the tests run, was it committed, did the deadline pass), check it. If it cannot be checked from here, label the finding "unverified" in the table.
-3. **Look for repeats.** If the project keeps lessons somewhere (an instruction file, a memory folder, a NOW.md), skim it. A mistake that was already written down as a rule and happened again is a more serious finding than a new one.
+3. **Look for repeats.** If the project keeps lessons somewhere (an instruction file, a memory folder, a notes file), skim it. A mistake that was already written down as a rule and happened again is a more serious finding than a new one.
 4. **Ask only if the answer changes the critique.** One round of questions at most, using a structured question tool if the agent has one: scope, whether wording is in or only process, whether the work is final or still a draft. Otherwise just write it.
 
 ## What to look for
