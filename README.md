@@ -30,6 +30,17 @@ Both are small on purpose. What they add over a capable agent with no skill is c
 
 `critique` asks for evidence behind every finding (a quote or a file and line), scales to what happened so a clean session gets a short answer, and reports without fixing: the user decides what is worth acting on.
 
+### Using them together
+
+I use the pair to move to a fresh session when the context window fills up:
+
+1. **`/critique`** while the whole session is still in view. The agent reviews its own work and proposes fixes and rules.
+2. **"Yes, fix it."** The fixes land in this session, where the agent still has the context to make them.
+3. **`/sum`** once the work is in its best state. The handoff describes the fixed version, not the flawed one.
+4. **New session.** Paste the block as the first message and carry on.
+
+The order matters. A summary written before the critique hands the next session problems it has no context to find.
+
 ## Evals
 
 `sum` and `critique` each ship with three recorded sessions in `skills/<name>/evals/`: a transcript, the project folder that session was working in, and a list of plain-language expectations.
