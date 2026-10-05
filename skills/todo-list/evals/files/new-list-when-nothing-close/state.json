@@ -1,0 +1,91 @@
+{
+  "artifacts": [
+    {
+      "url": "https://claude.ai/artifact/mock-001",
+      "title": "To-Do List",
+      "capabilities": {
+        "db": {},
+        "user": {}
+      },
+      "pinned": true
+    }
+  ],
+  "db": {
+    "https://claude.ai/artifact/mock-001": {
+      "lists": {
+        "shopping": {
+          "data": {
+            "name": "Shopping",
+            "order": 1000
+          },
+          "version": 1
+        },
+        "todo": {
+          "data": {
+            "name": "Todo",
+            "order": 2000
+          },
+          "version": 1
+        },
+        "groceries": {
+          "data": {
+            "name": "Groceries",
+            "order": 3000
+          },
+          "version": 1
+        }
+      },
+      "items": {
+        "m81qz": {
+          "data": {
+            "list": "shopping",
+            "text": "Batteries",
+            "done": false,
+            "created": "2026-09-21T15:01:00.000Z",
+            "doneAt": null,
+            "order": 1758000001000
+          },
+          "version": 1
+        },
+        "g44ab": {
+          "data": {
+            "list": "groceries",
+            "text": "Eggs",
+            "done": false,
+            "created": "2026-09-22T15:02:00.000Z",
+            "doneAt": null,
+            "order": 1758000002000
+          },
+          "version": 1
+        }
+      },
+      "history": {
+        "p0add": {
+          "data": {
+            "at": "2026-09-21T15:01:00.000Z",
+            "type": "add",
+            "text": "Added “Batteries”",
+            "list": "shopping",
+            "listName": "Shopping",
+            "by": "page",
+            "restored": false
+          },
+          "version": 1
+        },
+        "p1add": {
+          "data": {
+            "at": "2026-09-22T15:02:00.000Z",
+            "type": "add",
+            "text": "Added “Eggs”",
+            "list": "groceries",
+            "listName": "Groceries",
+            "by": "page",
+            "restored": false
+          },
+          "version": 1
+        }
+      }
+    }
+  },
+  "calls": []
+}

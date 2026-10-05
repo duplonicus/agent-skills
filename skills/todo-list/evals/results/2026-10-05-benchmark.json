@@ -1,0 +1,1646 @@
+{
+  "metadata": {
+    "skill_name": "todo-list",
+    "skill_path": "skills/todo-list",
+    "executor_model": "claude-opus-5-5 (claude -p --restricted, mock Artifact tools)",
+    "analyzer_model": "none: graded by evals/check.py",
+    "timestamp": "2026-10-05T19:36:35Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 16.1,
+        "tokens": 70369,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": true,
+          "evidence": "new history texts: ['Added “Paper towels”', 'Added “Coffee”']"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": true,
+          "evidence": "1 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 15.9,
+        "tokens": 70369,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": true,
+          "evidence": "new history texts: ['Added “Paper towels”', 'Added “Coffee”']"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": true,
+          "evidence": "1 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 16.1,
+        "tokens": 70371,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": true,
+          "evidence": "new history texts: ['Added “Paper towels”', 'Added “Coffee”']"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": true,
+          "evidence": "1 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 8.1,
+        "tokens": 43570,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should I add the furnace filter there, or make a new Home Depot list for it?"
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should I add the furnace filter there, or make a new Home Depot list for it?"
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('ArtifactData', 'list')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 8.2,
+        "tokens": 43570,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should I add the furnace filter there, or make a new Home Depot list for it?"
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should I add the furnace filter there, or make a new Home Depot list for it?"
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('ArtifactData', 'list')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 8.4,
+        "tokens": 43585,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should the furnace filter go on Hardware, or do you want a new Home Depot list for it? I "
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "You don't have a Home Depot list, but you do have a **Hardware** list. Should the furnace filter go on Hardware, or do you want a new Home Depot list for it? I "
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('ArtifactData', 'list')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 14.7,
+        "tokens": 70224,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": true,
+          "evidence": "snapshots: [{\"items\": [{\"id\": \"e99gs\", \"list\": \"shopping\", \"text\": \"Eggs\", \"done\": false, \"created\": \"2026-09-21T15:01:00.000Z\", \"doneAt\": null, \"order\": 1758000001000}]}]"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "1 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 17.1,
+        "tokens": 74068,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": true,
+          "evidence": "snapshots: [{\"items\": [{\"id\": \"e99gs\", \"list\": \"shopping\", \"text\": \"Eggs\", \"done\": false, \"created\": \"2026-09-21T15:01:00.000Z\", \"doneAt\": null, \"order\": 1758000001000}]}]"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "1 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 14.6,
+        "tokens": 70257,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": true,
+          "evidence": "snapshots: [{\"items\": [{\"id\": \"e99gs\", \"list\": \"shopping\", \"text\": \"Eggs\", \"done\": false, \"created\": \"2026-09-21T15:01:00.000Z\", \"doneAt\": null, \"order\": 1758000001000}]}]"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "1 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 15.4,
+        "tokens": 70054,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": true,
+          "evidence": "new history: [('uncheck', 'Unchecked “2% milk”')]"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Coffee was already on your Costco list, and I unchecked \"2% milk\" from Done so it's back on the list too."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 15.4,
+        "tokens": 70236,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": true,
+          "evidence": "new history: [('uncheck', 'Unchecked “2% milk”')]"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Milk is back on your Costco list — I unchecked the \"2% milk\" that was in Done rather than adding a second copy. Coffee was already on there, so I left it as is."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 14.8,
+        "tokens": 70075,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": true,
+          "evidence": "new history: [('uncheck', 'Unchecked “2% milk”')]"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Coffee was already on your Costco list, and I unchecked \"2% milk\" from Done so it's back on the list too."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 18.1,
+        "tokens": 84860,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": true,
+          "evidence": "new history types: ['new-list', 'add']"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "You didn't have a Hardware store list (only Shopping, Todo and Groceries), so I made one and added sponges to it."
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 18.2,
+        "tokens": 83340,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": true,
+          "evidence": "new history types: ['new-list', 'add']"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "You didn't have a Hardware store list (only Shopping, Todo and Groceries), so I made one and added sponges to it."
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 15.8,
+        "tokens": 69748,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": true,
+          "evidence": "new history types: ['new-list', 'add']"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "You didn't have a Hardware store list (only Shopping, Todo and Groceries), so I made one on your To-Do List page and added sponges to it."
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 25.5,
+        "tokens": 89133,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": true,
+          "evidence": "1 artifacts; capabilities: [{'db': {}, 'user': {}}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": true,
+          "evidence": "page found, no item text in it"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": true,
+          "evidence": "{'tent': True, 'stove': True, 'headlamp': True}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "3 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "with_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 25.2,
+        "tokens": 89889,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": true,
+          "evidence": "1 artifacts; capabilities: [{'db': {}, 'user': {}}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": true,
+          "evidence": "page found, no item text in it"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": true,
+          "evidence": "{'tent': True, 'stove': True, 'headlamp': True}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "3 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "with_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 25.1,
+        "tokens": 74140,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": true,
+          "evidence": "1 artifacts; capabilities: [{'db': {}, 'user': {}}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": true,
+          "evidence": "page found, no item text in it"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": true,
+          "evidence": "{'tent': True, 'stove': True, 'headlamp': True}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "3 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 18.2,
+        "tokens": 69260,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": false,
+          "evidence": "new history texts: []"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": false,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.6667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 15.8,
+        "tokens": 49022,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": false,
+          "evidence": "new history texts: []"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": false,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.6667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 12.8,
+        "tokens": 38490,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Paper towels and coffee are each on the Costco list exactly once",
+          "passed": true,
+          "evidence": "costco matches: towels=1, coffee=1"
+        },
+        {
+          "text": "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+          "passed": true,
+          "evidence": "2 new item docs; fields: [['created', 'done', 'doneAt', 'list', 'order', 'text'], ['created', 'done', 'doneAt', 'list', 'order', 'text']]"
+        },
+        {
+          "text": "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+          "passed": false,
+          "evidence": "new history texts: []"
+        },
+        {
+          "text": "Nothing that was already there changed: existing items, lists and history are identical",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        },
+        {
+          "text": "The reply is at most two lines and names the Costco list",
+          "passed": false,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 12.9,
+        "tokens": 37785,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": true,
+          "evidence": "I haven't added it yet, because your To-Do List has no list called \"Home Depot\". It has three lists: **Hardware** (currently just \"Wood screws\"), **Shopping** ("
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "I haven't added it yet, because your To-Do List has no list called \"Home Depot\". It has three lists: **Hardware** (currently just \"Wood screws\"), **Shopping** ("
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('Artifact', 'read'), ('ArtifactData', 'list'), ('ArtifactData', 'list')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 12.4,
+        "tokens": 37647,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": true,
+          "evidence": "I haven't added it yet: your To-Do List has no list called \"Home Depot\". The lists are **Hardware** (currently just \"Wood screws\"), **Shopping** and **Todo**.\n\n"
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "I haven't added it yet: your To-Do List has no list called \"Home Depot\". The lists are **Hardware** (currently just \"Wood screws\"), **Shopping** and **Todo**.\n\n"
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('Artifact', 'read'), ('ArtifactData', 'list'), ('ArtifactData', 'list')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 24.7,
+        "tokens": 70947,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Nothing was written: items, lists and history are identical to before",
+          "passed": false,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply asks the user a question",
+          "passed": false,
+          "evidence": "I added \"Furnace filter\" to your **Hardware** list in the [To-Do List](https://claude.ai/artifact/mock-001) artifact, since you don't have a list named \"Home De"
+        },
+        {
+          "text": "The reply names the Hardware list as the possible match",
+          "passed": true,
+          "evidence": "I added \"Furnace filter\" to your **Hardware** list in the [To-Do List](https://claude.ai/artifact/mock-001) artifact, since you don't have a list named \"Home De"
+        },
+        {
+          "text": "The live lists were read before answering",
+          "passed": true,
+          "evidence": "calls: [('Artifact', 'list'), ('Artifact', 'read'), ('ArtifactData', 'list'), ('ArtifactData', 'list'), ('ArtifactData', 'list'), ('ArtifactData', 'set'), ('ArtifactData', 'get')]"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 14.5,
+        "tokens": 47885,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": false,
+          "evidence": "snapshots: []"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "2 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 14.6,
+        "tokens": 47619,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": false,
+          "evidence": "snapshots: []"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "2 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 15.7,
+        "tokens": 49120,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Eggs is gone from the Shopping list",
+          "passed": true,
+          "evidence": "egg items after: []"
+        },
+        {
+          "text": "Bread and Butter are untouched",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+          "passed": false,
+          "evidence": "snapshots: []"
+        },
+        {
+          "text": "The reply is at most two lines",
+          "passed": true,
+          "evidence": "2 lines"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 12.5,
+        "tokens": 38432,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": false,
+          "evidence": "new history: []"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Both are on the Costco list now, with no new entries needed:\n\n- **Coffee** was already on the list and unchecked, so I left it as is.\n- **Milk** was there as \"2"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 11.1,
+        "tokens": 37751,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": false,
+          "evidence": "new history: []"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Both are on the Costco list now, with no new entries needed:\n\n- **Coffee** was already on the list and unchecked, so I left it alone.\n- **Milk** was there as \"2"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 11.9,
+        "tokens": 37823,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Coffee is on the Costco list once, not twice",
+          "passed": true,
+          "evidence": "1 coffee items"
+        },
+        {
+          "text": "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+          "passed": true,
+          "evidence": "1 milk items; m1lk2 = {'done': False, 'doneAt': None}"
+        },
+        {
+          "text": "History has an uncheck entry for the milk",
+          "passed": false,
+          "evidence": "new history: []"
+        },
+        {
+          "text": "The Costco list still has three items",
+          "passed": true,
+          "evidence": "3 items on costco"
+        },
+        {
+          "text": "The reply says coffee was already on the list",
+          "passed": true,
+          "evidence": "Both are on the Costco list now, without adding any duplicates:\n\n- **Milk** – \"2% milk\" was already there but checked off on Sept 30, so I unchecked it rather t"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8333,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 14.5,
+        "tokens": 47947,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware Store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": false,
+          "evidence": "new history types: []"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "You didn't have a hardware store list, so I created one called \"Hardware Store\" in your [To-Do List](https://claude.ai/artifact/mock-001) and added Sponges to i"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.8333,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 15.7,
+        "tokens": 48072,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware Store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": false,
+          "evidence": "new history types: []"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "Sponges are added, but you didn't have a hardware store list yet, so I created one. Your [To-Do List](https://claude.ai/artifact/mock-001) had only Shopping, To"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.8333,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 17.6,
+        "tokens": 48767,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "One new list was made, named for the hardware store, ordered after the existing lists",
+          "passed": true,
+          "evidence": "new lists: [('hardware-store', {'name': 'Hardware Store', 'order': 4000})]"
+        },
+        {
+          "text": "Sponges is on the new list, and on no other list",
+          "passed": true,
+          "evidence": "sponge items: ['hardware-store']"
+        },
+        {
+          "text": "History has an entry for making the list and an entry for adding the item",
+          "passed": false,
+          "evidence": "new history types: []"
+        },
+        {
+          "text": "Nothing that was already there changed",
+          "passed": true,
+          "evidence": "compared before and after"
+        },
+        {
+          "text": "The reply tells the user a new list was made",
+          "passed": true,
+          "evidence": "Sponges is now on a new **Hardware Store** list in your [To-Do List](https://claude.ai/artifact/mock-001) artifact.\n\nYou didn't have a hardware store list yet —"
+        },
+        {
+          "text": "The page was not republished",
+          "passed": true,
+          "evidence": "0 publish calls"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 31.7,
+        "tokens": 41166,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": false,
+          "evidence": "1 artifacts; capabilities: [{}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": false,
+          "evidence": "item text found in the published HTML"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": false,
+          "evidence": "{'tent': False, 'stove': False, 'headlamp': False}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "without_skill",
+      "run_number": 2,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 27.1,
+        "tokens": 22466,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": false,
+          "evidence": "1 artifacts; capabilities: [{}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": false,
+          "evidence": "item text found in the published HTML"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": false,
+          "evidence": "{'tent': False, 'stove': False, 'headlamp': False}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "without_skill",
+      "run_number": 3,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 21.2,
+        "tokens": 29786,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Exactly one artifact was published, with a database capability",
+          "passed": true,
+          "evidence": "1 artifacts; capabilities: [{'db': {}}]"
+        },
+        {
+          "text": "The published page does not hardcode the items; they live in the database",
+          "passed": false,
+          "evidence": "item text found in the published HTML"
+        },
+        {
+          "text": "Tent, stove and headlamps each exist as a document in the page's database",
+          "passed": false,
+          "evidence": "{'tent': False, 'stove': False, 'headlamp': False}"
+        },
+        {
+          "text": "The page was not pinned without the user being asked",
+          "passed": true,
+          "evidence": "pinned: [False]"
+        },
+        {
+          "text": "The reply gives the user the page or says how to open it, in at most five lines",
+          "passed": true,
+          "evidence": "4 lines"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 16.2611,
+        "stddev": 5.1668,
+        "min": 8.1,
+        "max": 25.5
+      },
+      "tokens": {
+        "mean": 69881.0,
+        "stddev": 13910.1074,
+        "min": 43570,
+        "max": 89889
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.7333,
+        "stddev": 0.1726,
+        "min": 0.4,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 16.9389,
+        "stddev": 5.7216,
+        "min": 11.1,
+        "max": 31.7
+      },
+      "tokens": {
+        "mean": 44443.6111,
+        "stddev": 11848.3385,
+        "min": 22466,
+        "max": 70947
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.27",
+      "time_seconds": "-0.7",
+      "tokens": "+25437"
+    }
+  },
+  "notes": []
+}

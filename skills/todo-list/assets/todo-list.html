@@ -1,0 +1,510 @@
+<title>To-Do List</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
+<style>
+/* Layout: one narrow column of big tap targets, list tabs on top, add box under the tabs, History as its own view. Large type, readable at a distance. Palette matches the Claude app: warm neutrals, clay accent. */
+:root{
+  --bg:#faf9f5; --surface:#ffffff; --ink:#141413; --muted:#6b6a65; --line:#e5e3db;
+  --accent:#c96442; --accent-ink:#ffffff; --done:#a3a29c; --danger:#b3261e; --ok:#3f7d4e;
+  --toast-bg:#141413; --toast-ink:#faf9f5;
+  --body:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#262624; --surface:#30302e; --ink:#faf9f5; --muted:#a6a39b; --line:#3e3e3a;
+  --accent:#d97757; --accent-ink:#1f1e1d; --done:#7a7872; --danger:#f2715f; --ok:#7fbf8e;
+  --toast-bg:#faf9f5; --toast-ink:#1f1e1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#262624; --surface:#30302e; --ink:#faf9f5; --muted:#a6a39b; --line:#3e3e3a;
+  --accent:#d97757; --accent-ink:#1f1e1d; --done:#7a7872; --danger:#f2715f; --ok:#7fbf8e;
+  --toast-bg:#faf9f5; --toast-ink:#1f1e1d; color-scheme:dark}
+html{font-size:18px}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.1rem;line-height:1.45}
+.wrap{max-width:40rem;margin:0 auto;padding-inline:16px;padding-block:20px 96px;display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{font:700 1.05rem var(--body);padding:10px 16px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;gap:8px;align-items:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tab .n{font-variant-numeric:tabular-nums;font-weight:400;opacity:.8}
+.tab.new,.tab.hist{border-style:dashed;color:var(--muted)}
+.tab.hist[aria-selected="true"]{border-style:solid;color:var(--accent-ink)}
+form.add{display:flex;gap:8px}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:1.15rem;padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+button{font:inherit;cursor:pointer}
+.btn{font-weight:700;padding:12px 18px;border-radius:12px;border:none;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--muted);border:2px solid var(--line)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.small{font-size:.9rem;padding:8px 14px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+li:first-child{border-top:none}
+.check{flex:none;width:34px;height:34px;border-radius:9px;border:2.5px solid var(--muted);background:transparent;display:grid;place-items:center;padding:0;color:var(--accent-ink)}
+.check svg{width:20px;height:20px;opacity:0}
+li.done .check{background:var(--done);border-color:var(--done)}
+li.done .check svg{opacity:1}
+.text{flex:1;min-width:0;overflow-wrap:anywhere;cursor:text;padding:4px 0}
+li.done .text{color:var(--done);text-decoration:line-through}
+.text input{width:100%;box-sizing:border-box;padding:6px 10px;font-size:1.1rem}
+.del{flex:none;background:none;border:none;color:var(--muted);font-size:1.5rem;line-height:1;width:40px;height:40px;border-radius:8px}
+.del:hover{color:var(--danger);background:var(--bg)}
+.sub{font:700 .8rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:8px 2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sub button{background:none;border:none;color:var(--accent);font:700 .85rem var(--body);text-transform:none;letter-spacing:0;padding:6px}
+.empty{background:var(--surface);border:2px dashed var(--line);border-radius:14px;padding:22px;color:var(--muted);text-align:center}
+.empty b{color:var(--ink)}
+.listbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:8px}
+.listbar input[type=text]{padding:8px 12px;font-size:1rem}
+.notice{background:var(--surface);border:2px solid var(--danger);border-radius:12px;padding:14px;color:var(--ink)}
+.grip{flex:none;width:28px;height:40px;display:grid;place-items:center;color:var(--muted);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;font-size:1.3rem;line-height:1;margin-left:-6px}
+.grip:active{cursor:grabbing}
+.sortable-ghost{opacity:.35}
+.sortable-chosen,.sortable-drag{background:var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.18)}
+/* History view */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font:700 .9rem var(--body);padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
+.filters .spacer{flex:1}
+.hrow{align-items:flex-start}
+.hicon{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:1rem;background:var(--bg);color:var(--muted);margin-top:2px}
+.hicon.del{color:var(--danger)}
+.hicon.add{color:var(--accent)}
+.hicon.ok{color:var(--ok)}
+.hbody{flex:1;min-width:0;overflow-wrap:anywhere}
+.hmeta{font-size:.82rem;color:var(--muted);margin-top:2px}
+.badge{font:700 .7rem var(--body);text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted);margin-left:4px;vertical-align:1px}
+.hrow .btn{flex:none;align-self:center}
+.restored{flex:none;align-self:center;font-size:.85rem;color:var(--ok);font-weight:700}
+/* Undo toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom, 0px));width:min(36rem, calc(100% - 32px));box-sizing:border-box;background:var(--toast-bg);color:var(--toast-ink);border-radius:14px;padding:12px 12px 12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:10}
+.toast span{flex:1;min-width:0;overflow-wrap:anywhere}
+.toast button{flex:none;background:transparent;border:2px solid var(--toast-ink);color:var(--toast-ink);font-weight:700;border-radius:10px;padding:8px 16px}
+@media (prefers-reduced-motion:no-preference){li{transition:background .15s}.toast{animation:up .2s ease-out}@keyframes up{from{transform:translate(-50%,12px);opacity:0}}}
+</style>
+
+<div class="wrap">
+  <div class="notice" id="notice" hidden></div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Lists"></nav>
+  <form class="add" id="addForm" hidden>
+    <input type="text" id="addInput" autocomplete="off" list="suggest" placeholder="Add an item…" aria-label="New item">
+    <button class="btn" type="submit">Add</button>
+  </form>
+  <datalist id="suggest"></datalist>
+  <form class="add" id="newListForm" hidden>
+    <input type="text" id="newListInput" autocomplete="off" placeholder="New list name…" aria-label="New list name">
+    <button class="btn" type="submit">Create</button>
+    <button class="btn ghost" type="button" id="cancelNewList">Cancel</button>
+  </form>
+  <main id="main">
+    <div class="empty"><b>Your lists load here.</b><br>Shopping, todo, whatever you need. Add items by typing, or just tell Claude.</div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden><span id="toastText"></span><button type="button" id="toastUndo">Undo</button></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const HIST = "__history";
+  const HISTORY_CAP = 300;
+  let db = null, lists = [], items = [], history = [], current = null, editing = null, armedDelete = false, canWrite = true;
+  let renaming = false, histFilter = "all", armedClearHist = false;
+  let dragging = false, pending = false, openOrder = [], justDragged = false, toastTimer = null;
+  const key = i => typeof i.order === "number" ? i.order : (Date.parse(i.created || "") || 0);
+  const lkey = l => typeof l.order === "number" ? l.order : 0;
+  const strip = o => { const { id, ...rest } = o; return rest; };
+  const listName = id => lists.find(l => l.id === id)?.name || "";
+
+  async function reorder(arr, from, to, coll, k) {
+    if (from === to) return;
+    const moved = arr[from]; const rest = arr.filter((_, i) => i !== from); rest.splice(to, 0, moved);
+    const prev = rest[to - 1], next = rest[to + 1];
+    let v = prev && next ? (k(prev) + k(next)) / 2 : prev ? k(prev) + 1000 : next ? k(next) - 1000 : 0;
+    try {
+      if ((prev && v === k(prev)) || (next && v === k(next))) {
+        for (let i = 0; i < rest.length; i++) await db.doc(coll + "/" + rest[i].id).update({ order: (i + 1) * 1000 });
+      } else {
+        await db.doc(coll + "/" + moved.id).update({ order: v });
+      }
+    } catch (e) { fail(e); render(); }
+  }
+  const sortOpts = { animation: 150, forceFallback: true, fallbackTolerance: 4, ghostClass: "sortable-ghost",
+    chosenClass: "sortable-chosen", dragClass: "sortable-drag", onStart: () => { dragging = true; } };
+  function endDrag() { dragging = false; justDragged = true; setTimeout(() => { justDragged = false; }, 50); if (pending) { pending = false; render(); } }
+  try { current = localStorage.getItem("currentList"); } catch (e) {}
+
+  const slug = s => (s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "list").slice(0, 40);
+  const showNotice = t => { const n = $("notice"); n.textContent = t; n.hidden = !t; };
+  const fail = e => {
+    if (e && e.code === "invalid_argument") { canWrite = false; showNotice("You can view these lists but not change them."); render(); return; }
+    showNotice("Couldn't save that change" + (e && e.code === "quota_exceeded" ? ": storage is full. Clear done items or history to free space." : ". Try again."));
+  };
+
+  // ---------- History log ----------
+  // Every change writes one history doc. Deletes carry a snapshot so they can be restored.
+  async function log(type, text, list, snapshot) {
+    const ref = db.collection("history").doc();
+    const entry = { at: new Date().toISOString(), type, text, list: list || null, listName: listName(list) || (snapshot?.list?.name) || null, by: "page", restored: false };
+    if (snapshot) entry.snapshot = snapshot;
+    try { await ref.set(entry); } catch (e) { /* logging never blocks the action */ }
+    prune();
+    return ref.id;
+  }
+  let pruning = false;
+  async function prune() {
+    if (pruning || history.length <= HISTORY_CAP) return;
+    pruning = true;
+    const old = history.slice(HISTORY_CAP);
+    for (const h of old) { try { await db.doc("history/" + h.id).delete(); } catch (e) { break; } }
+    pruning = false;
+  }
+  async function restore(h) {
+    const snap = h.snapshot; if (!snap) return;
+    try {
+      if (snap.list) {
+        await db.doc("lists/" + snap.list.id).set(strip(snap.list));
+      } else {
+        // Item(s) whose list has since been deleted: bring the list back too.
+        const ids = [...new Set((snap.items || []).map(i => i.list))];
+        for (const lid of ids) {
+          if (!lists.some(l => l.id === lid)) {
+            await db.doc("lists/" + lid).set({ name: h.listName || "Restored", order: lists.length ? Math.max(...lists.map(lkey)) + 1000 : 1000 });
+          }
+        }
+      }
+      for (const it of snap.items || []) await db.doc("items/" + it.id).set(strip(it));
+      try { await db.doc("history/" + h.id).update({ restored: true, restoredAt: new Date().toISOString() }); } catch (e) { /* history entry missing; the restore itself worked */ }
+      const target = snap.list ? snap.list.id : snap.items?.[0]?.list;
+      hideToast();
+      if (target) pick(target);
+    } catch (e) { fail(e); }
+  }
+
+  // ---------- Undo toast ----------
+  function showToast(text, entry) {
+    $("toastText").textContent = text;
+    $("toastUndo").onclick = () => restore(entry);
+    $("toast").hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 7000);
+  }
+  function hideToast() { clearTimeout(toastTimer); $("toast").hidden = true; }
+
+  // ---------- Actions ----------
+  async function deleteItem(it) {
+    const snapshot = { items: [it] };
+    try { await db.doc("items/" + it.id).delete(); } catch (e) { fail(e); return; }
+    const hid = await log("delete-item", "Deleted “" + it.text + "”", it.list, snapshot);
+    showToast("Deleted “" + it.text + "”", { id: hid, snapshot, listName: listName(it.list) });
+  }
+  async function clearDone(done) {
+    const snapshot = { items: done };
+    for (const i of done) { try { await db.doc("items/" + i.id).delete(); } catch (e) { fail(e); break; } }
+    const n = done.length + (done.length === 1 ? " item" : " items");
+    const hid = await log("clear-done", "Cleared " + n + " from done", current, snapshot);
+    showToast("Cleared " + n, { id: hid, snapshot, listName: listName(current) });
+  }
+  async function deleteList(id) {
+    const l = lists.find(x => x.id === id); if (!l) return;
+    const its = items.filter(i => i.list === id);
+    const snapshot = { list: l, items: its };
+    try {
+      for (const i of its) await db.doc("items/" + i.id).delete();
+      await db.doc("lists/" + id).delete();
+    } catch (e) { fail(e); return; }
+    const txt = "Deleted list “" + l.name + "”" + (its.length ? " (" + its.length + (its.length === 1 ? " item)" : " items)") : "");
+    const hid = await log("delete-list", txt, id, snapshot);
+    showToast("Deleted “" + l.name + "”", { id: hid, snapshot, listName: l.name });
+  }
+
+  function pick(id) {
+    current = id; armedDelete = false; editing = null; renaming = false; armedClearHist = false;
+    if (id !== HIST) { try { localStorage.setItem("currentList", id); } catch (e) {} }
+    render();
+  }
+
+  function renderTabs() {
+    const t = $("tabs"); t.textContent = "";
+    for (const l of lists) {
+      const open = items.filter(i => i.list === l.id && !i.done).length;
+      const b = document.createElement("button");
+      b.className = "tab"; b.type = "button"; b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", String(l.id === current));
+      b.append(l.name);
+      const n = document.createElement("span"); n.className = "n"; n.textContent = open; b.append(n);
+      b.dataset.id = l.id;
+      b.onclick = () => { if (!justDragged) pick(l.id); };
+      t.append(b);
+    }
+    if (canWrite && db) {
+      const nb = document.createElement("button");
+      nb.className = "tab new"; nb.type = "button"; nb.textContent = "+ New list";
+      nb.onclick = () => { $("newListForm").hidden = false; $("newListInput").focus(); };
+      t.append(nb);
+    }
+    if (db) {
+      const hb = document.createElement("button");
+      hb.className = "tab hist"; hb.type = "button"; hb.setAttribute("role", "tab");
+      hb.setAttribute("aria-selected", String(current === HIST));
+      hb.textContent = "History";
+      hb.onclick = () => pick(HIST);
+      t.append(hb);
+    }
+  }
+
+  function itemRow(it) {
+    const li = document.createElement("li");
+    if (it.done) li.className = "done";
+    if (!it.done && canWrite) {
+      const g = document.createElement("span"); g.className = "grip"; g.textContent = "⠿";
+      g.setAttribute("aria-hidden", "true"); g.title = "Drag to reorder";
+      li.append(g);
+    }
+    const c = document.createElement("button");
+    c.className = "check"; c.type = "button"; c.innerHTML = CHECK;
+    c.setAttribute("aria-label", (it.done ? "Uncheck " : "Check off ") + it.text);
+    c.onclick = () => {
+      db.doc("items/" + it.id).update({ done: !it.done, doneAt: it.done ? null : new Date().toISOString() })
+        .then(() => log(it.done ? "uncheck" : "check", (it.done ? "Unchecked “" : "Checked off “") + it.text + "”", it.list))
+        .catch(fail);
+    };
+    if (!canWrite) c.disabled = true;
+    const tx = document.createElement("div"); tx.className = "text";
+    if (editing === it.id) {
+      const inp = document.createElement("input"); inp.type = "text"; inp.id = "edit-" + it.id; inp.value = it.text;
+      let saved = false;
+      const save = () => {
+        if (saved) return; saved = true;
+        const v = inp.value.trim(); editing = null;
+        if (v && v !== it.text) db.doc("items/" + it.id).update({ text: v })
+          .then(() => log("edit", "Changed “" + it.text + "” to “" + v + "”", it.list)).catch(fail);
+        render();
+      };
+      inp.onkeydown = e => { if (e.key === "Enter") save(); if (e.key === "Escape") { saved = true; editing = null; render(); } };
+      inp.onblur = save;
+      tx.append(inp);
+      setTimeout(() => { inp.focus(); inp.select(); }, 0);
+    } else {
+      tx.textContent = it.text;
+      if (canWrite) { tx.title = "Tap to edit"; tx.onclick = () => { editing = it.id; render(); }; }
+    }
+    li.append(c, tx);
+    if (canWrite) {
+      const d = document.createElement("button");
+      d.className = "del"; d.type = "button"; d.textContent = "×"; d.setAttribute("aria-label", "Delete " + it.text);
+      d.onclick = () => deleteItem(it);
+      li.append(d);
+    }
+    return li;
+  }
+
+  // Suggestions for the add box: things you've added to this list before that aren't on it now.
+  function renderSuggestions() {
+    const dl = $("suggest"); dl.textContent = "";
+    if (!current || current === HIST) return;
+    const onList = new Set(items.filter(i => i.list === current && !i.done).map(i => i.text.toLowerCase()));
+    const counts = new Map();
+    for (const h of history) {
+      if (h.list !== current || h.type !== "add") continue;
+      const m = /^Added “(.*)”$/.exec(h.text || ""); if (!m) continue;
+      const k = m[1].toLowerCase(); if (onList.has(k)) continue;
+      const c = counts.get(k) || { text: m[1], n: 0 }; c.n++; counts.set(k, c);
+    }
+    for (const i of items) if (i.list === current && i.done && !onList.has(i.text.toLowerCase()) && !counts.has(i.text.toLowerCase())) counts.set(i.text.toLowerCase(), { text: i.text, n: 1 });
+    [...counts.values()].sort((a, b) => b.n - a.n).slice(0, 50).forEach(c => {
+      const o = document.createElement("option"); o.value = c.text; dl.append(o);
+    });
+  }
+
+  const ICONS = { "add": ["+", "add"], "check": ["✓", "ok"], "uncheck": ["↺", ""], "edit": ["✎", ""],
+    "delete-item": ["×", "del"], "clear-done": ["×", "del"], "delete-list": ["×", "del"],
+    "new-list": ["+", "add"], "rename-list": ["✎", ""] };
+  const dayLabel = d => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const that = new Date(d); that.setHours(0, 0, 0, 0);
+    const diff = Math.round((today - that) / 864e5);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    return that.toLocaleDateString([], { weekday: diff < 7 ? "long" : undefined, month: "short", day: "numeric" });
+  };
+
+  function renderHistory(main) {
+    const f = document.createElement("div"); f.className = "filters";
+    for (const [k, label] of [["all", "Everything"], ["deleted", "Deleted"]]) {
+      const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.textContent = label;
+      c.setAttribute("aria-pressed", String(histFilter === k));
+      c.onclick = () => { histFilter = k; render(); };
+      f.append(c);
+    }
+    const sp = document.createElement("span"); sp.className = "spacer"; f.append(sp);
+    if (canWrite && history.length) {
+      const cl = document.createElement("button"); cl.type = "button";
+      cl.className = armedClearHist ? "btn danger small" : "btn ghost small";
+      cl.textContent = armedClearHist ? "Tap again to clear history" : "Clear history";
+      cl.onclick = async () => {
+        if (!armedClearHist) { armedClearHist = true; render(); return; }
+        armedClearHist = false;
+        for (const h of history.slice()) { try { await db.doc("history/" + h.id).delete(); } catch (e) { fail(e); break; } }
+      };
+      f.append(cl);
+    }
+    main.append(f);
+    const rows = history.filter(h => histFilter === "all" || h.snapshot);
+    if (!rows.length) {
+      const e = document.createElement("div"); e.className = "empty";
+      e.innerHTML = histFilter === "deleted" ? "<b>Nothing deleted yet.</b><br>Deleted items and lists show up here so you can bring them back."
+        : "<b>No history yet.</b><br>Adds, check-offs, edits and deletes show up here from now on.";
+      main.append(e); return;
+    }
+    let lastDay = null, ul = null;
+    for (const h of rows) {
+      const d = dayLabel(h.at);
+      if (d !== lastDay) {
+        const s = document.createElement("div"); s.className = "sub"; s.textContent = d; main.append(s);
+        ul = document.createElement("ul"); main.append(ul); lastDay = d;
+      }
+      const li = document.createElement("li"); li.className = "hrow";
+      const [glyph, cls] = ICONS[h.type] || ["•", ""];
+      const ic = document.createElement("span"); ic.className = "hicon " + cls; ic.textContent = glyph; ic.setAttribute("aria-hidden", "true");
+      const body = document.createElement("div"); body.className = "hbody";
+      body.append(h.text || h.type);
+      const meta = document.createElement("div"); meta.className = "hmeta";
+      const time = new Date(h.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      meta.textContent = time + (h.listName && h.type !== "delete-list" ? " · " + h.listName : "");
+      if (h.by === "claude") { const b = document.createElement("span"); b.className = "badge"; b.textContent = "Claude"; meta.append(b); }
+      body.append(meta);
+      li.append(ic, body);
+      if (h.snapshot) {
+        if (h.restored) {
+          const r = document.createElement("span"); r.className = "restored"; r.textContent = "Restored"; li.append(r);
+        } else if (canWrite) {
+          const r = document.createElement("button"); r.type = "button"; r.className = "btn ghost small"; r.textContent = "Restore";
+          r.onclick = () => { r.disabled = true; restore(h); };
+          li.append(r);
+        }
+      }
+      ul.append(li);
+    }
+  }
+
+  function render() {
+    if (dragging) { pending = true; return; }
+    renderTabs();
+    const main = $("main"); main.textContent = "";
+    $("addForm").hidden = true;
+    if (!db) {
+      main.innerHTML = '<div class="empty"><b>Your lists load here.</b><br>Open this page while signed in to Claude to see and edit them.</div>';
+      return;
+    }
+    if (current === HIST) { renderHistory(main); return; }
+    if (!lists.length) {
+      main.innerHTML = '<div class="empty"><b>No lists yet.</b><br>Tap “+ New list” to make one, like Shopping or Todo. Deleted one by accident? It’s in History.</div>';
+      return;
+    }
+    if (!lists.some(l => l.id === current)) { current = lists[0].id; renderTabs(); }
+    $("addForm").hidden = !canWrite;
+    $("addInput").placeholder = "Add to " + listName(current) + "…";
+    renderSuggestions();
+    const mine = items.filter(i => i.list === current);
+    const open = mine.filter(i => !i.done).sort((a, b) => key(a) - key(b));
+    openOrder = open;
+    const done = mine.filter(i => i.done).sort((a, b) => (b.doneAt || "").localeCompare(a.doneAt || ""));
+    if (!open.length) {
+      const e = document.createElement("div"); e.className = "empty";
+      e.innerHTML = done.length ? "<b>All done.</b> Nothing left on this list." : "<b>Nothing here yet.</b><br>Type above and hit Add.";
+      main.append(e);
+    } else {
+      const ul = document.createElement("ul"); open.forEach(i => ul.append(itemRow(i))); main.append(ul);
+      if (canWrite && window.Sortable && open.length > 1) {
+        Sortable.create(ul, { ...sortOpts, handle: ".grip",
+          onEnd: e => { const arr = openOrder; endDrag(); reorder(arr, e.oldIndex, e.newIndex, "items", key).then(() => { if (!dragging) render(); }); render(); } });
+      }
+    }
+    if (done.length) {
+      const h = document.createElement("div"); h.className = "sub";
+      h.append("Done · " + done.length);
+      if (canWrite) {
+        const cb = document.createElement("button"); cb.type = "button"; cb.textContent = "Clear done";
+        cb.onclick = () => clearDone(done);
+        h.append(cb);
+      }
+      main.append(h);
+      const ul = document.createElement("ul"); done.forEach(i => ul.append(itemRow(i))); main.append(ul);
+    }
+    if (canWrite) {
+      const bar = document.createElement("div"); bar.className = "listbar";
+      if (renaming) {
+        const inp = document.createElement("input"); inp.type = "text"; inp.id = "renameInput"; inp.value = listName(current); inp.setAttribute("aria-label", "List name");
+        const ok = document.createElement("button"); ok.type = "button"; ok.className = "btn small"; ok.textContent = "Save";
+        const no = document.createElement("button"); no.type = "button"; no.className = "btn ghost small"; no.textContent = "Cancel";
+        const save = () => {
+          const v = inp.value.trim(), old = listName(current), id = current; renaming = false;
+          if (v && v !== old) db.doc("lists/" + id).update({ name: v }).then(() => log("rename-list", "Renamed list “" + old + "” to “" + v + "”", id)).catch(fail);
+          render();
+        };
+        ok.onclick = save; no.onclick = () => { renaming = false; render(); };
+        inp.onkeydown = e => { if (e.key === "Enter") save(); if (e.key === "Escape") { renaming = false; render(); } };
+        bar.append(inp, ok, no);
+        setTimeout(() => { inp.focus(); inp.select(); }, 0);
+      } else {
+        const rn = document.createElement("button"); rn.type = "button"; rn.className = "btn ghost small"; rn.textContent = "Rename list";
+        rn.onclick = () => { renaming = true; armedDelete = false; render(); };
+        const del = document.createElement("button"); del.type = "button";
+        del.className = armedDelete ? "btn danger small" : "btn ghost small";
+        del.textContent = armedDelete ? "Tap again to delete this list" : "Delete list";
+        del.onclick = () => {
+          if (!armedDelete) { armedDelete = true; render(); return; }
+          armedDelete = false; deleteList(current);
+        };
+        bar.append(rn, del);
+      }
+      main.append(bar);
+    }
+  }
+
+  $("addForm").onsubmit = e => {
+    e.preventDefault();
+    const v = $("addInput").value.trim(); if (!v || !current || current === HIST) return;
+    $("addInput").value = "";
+    const list = current;
+    const top = items.filter(i => i.list === list && !i.done).reduce((m, i) => Math.max(m, key(i)), 0);
+    db.collection("items").add({ list, text: v, done: false, created: new Date().toISOString(), doneAt: null, order: Math.max(Date.now(), top + 1000) })
+      .then(() => log("add", "Added “" + v + "”", list)).catch(fail);
+  };
+  $("newListForm").onsubmit = e => {
+    e.preventDefault();
+    const name = $("newListInput").value.trim(); if (!name) return;
+    let id = slug(name); if (lists.some(l => l.id === id) || id === HIST) id += "-" + Date.now().toString(36);
+    $("newListInput").value = ""; $("newListForm").hidden = true;
+    db.doc("lists/" + id).set({ name, order: lists.length ? Math.max(...lists.map(lkey)) + 1000 : 1000 })
+      .then(() => { pick(id); log("new-list", "Made list “" + name + "”", id); }).catch(fail);
+  };
+  $("cancelNewList").onclick = () => { $("newListForm").hidden = true; $("newListInput").value = ""; };
+
+  (async () => {
+    try { db = await window.claude?.use?.("db"); } catch (e) { db = null; }
+    if (!db) { render(); return; }
+    try {
+      const user = await window.claude.use("user");
+      if (user && typeof user.can === "function") { const w = await user.can("data.write"); if (w === false) canWrite = false; }
+    } catch (e) {}
+    if (canWrite && window.Sortable) {
+      Sortable.create($("tabs"), { ...sortOpts, draggable: ".tab:not(.new):not(.hist)", filter: ".new,.hist",
+        delay: 220, delayOnTouchOnly: true, preventOnFilter: false,
+        onMove: e => !e.related.classList.contains("new") && !e.related.classList.contains("hist"),
+        onEnd: e => { const arr = lists.slice(); endDrag(); reorder(arr, e.oldIndex, e.newIndex, "lists", lkey); render(); } });
+    }
+    const onErr = () => showNotice("Lost the connection to your lists. Reload the page.");
+    const rerender = () => { if (!editing && !renaming) render(); else renderTabs(); };
+    db.collection("lists").onSnapshot(s => {
+      lists = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => lkey(a) - lkey(b) || a.name.localeCompare(b.name));
+      rerender();
+    }, onErr);
+    db.collection("items").onSnapshot(s => {
+      items = s.docs.map(d => ({ id: d.id, ...d.data() }));
+      rerender();
+    }, onErr);
+    db.collection("history").onSnapshot(s => {
+      history = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+      if (current === HIST) { if (!dragging) render(); } else renderSuggestions();
+    }, onErr);
+  })();
+})();
+</script>

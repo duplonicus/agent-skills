@@ -12,8 +12,18 @@ Two configurations per eval:
 
 Runs use `claude -p --restricted`, which ignores user/project settings and
 instruction files and confines file tools to the sandbox, so neither
-configuration can see the author's own setup. Swap AGENT_CMD to test another
-agent.
+configuration can see the author's own setup. Change agent_cmd() to test
+another agent.
+
+Two kinds of fixture, both under skills/<skill>/evals/files/<name>/:
+  transcript.md + project/   a recorded session; the agent continues it
+  state.json                 a seeded database for scripts/mock_artifacts.py;
+                             the agent starts fresh with mock Artifact and
+                             ArtifactData tools and a shell for python3
+
+If the skill has evals/check.py, each run is graded by it (deterministic
+checks on the reply and the final state). Otherwise grade with
+scripts/blind_grading.py.
 
 Usage:
     scripts/run_evals.py sum --iteration 1 [--runs 1] [--model MODEL] [--jobs 4]
@@ -49,19 +59,36 @@ The user's next message is:
 
 Respond as you would in that session, doing whatever file work the message calls for. Your final message is your reply to the user."""
 
+FRESH_PROMPT = """A user is starting a conversation with you.
+
+The Artifact and ArtifactData tools are available in this session as `mcp__artifacts__Artifact` and `mcp__artifacts__ArtifactData`. You can run `python3` in the shell.
+{note}{skill}
+Work only inside the current directory.
+
+The user's message is:
+
+{message}
+
+Respond as you would, using your tools to do what the message calls for. Your final message is your reply to the user."""
+
 SKILL_LINE = "\nA skill that applies to the user's next message is installed at `./skill/SKILL.md`. Read it first and follow it.\n"
 
 
-def agent_cmd(prompt, model):
+def agent_cmd(prompt, model, mcp_config=None):
     cmd = ["claude", "-p", prompt, "--restricted", "--strict-mcp-config",
            "--permission-mode", "acceptEdits", "--no-session-persistence",
            "--output-format", "json"]
+    if mcp_config:
+        cmd += ["--mcp-config", str(mcp_config), "--tools", "Bash,Read,Write,Edit,Glob,Grep",
+                "--allowedTools", "mcp__artifacts__Artifact,mcp__artifacts__ArtifactData,Bash(python3:*)"]
     if model:
         cmd += ["--model", model]
     return cmd
 
 
 def snapshot(folder):
+    if not folder.is_dir():
+        return {}
     return {p.relative_to(folder).as_posix(): p for p in folder.rglob("*") if p.is_file()}
 
 
@@ -75,11 +102,21 @@ def run_one(skill, ev, config, run_dir, model):
         shutil.copytree(ROOT / "skills" / skill, sandbox / "skill",
                         ignore=shutil.ignore_patterns("evals"))
     note = f"\n{ev['harness_note']}\n" if ev.get("harness_note") else ""
-    prompt = PROMPT.format(note=note, skill=SKILL_LINE if config == "with_skill" else "",
-                           message=ev["prompt"])
+    template = PROMPT if (fixture / "transcript.md").exists() else FRESH_PROMPT
+    prompt = template.format(note=note, skill=SKILL_LINE if config == "with_skill" else "",
+                             message=ev["prompt"])
+    mcp_config = None
+    if (sandbox / "state.json").exists():
+        # The state file sits outside the sandbox so the agent only reaches it through the tools.
+        state = run_dir / "state.json"
+        shutil.move(sandbox / "state.json", state)
+        mcp_config = run_dir / "mcp.json"
+        mcp_config.write_text(json.dumps({"mcpServers": {"artifacts": {
+            "command": sys.executable, "args": [str(ROOT / "scripts" / "mock_artifacts.py")],
+            "env": {"MOCK_STATE": str(state)}}}}))
     start = time.time()
-    proc = subprocess.run(agent_cmd(prompt, model), cwd=sandbox, capture_output=True,
-                          text=True, timeout=900)
+    proc = subprocess.run(agent_cmd(prompt, model, mcp_config), cwd=sandbox, capture_output=True,
+                          text=True, timeout=900, stdin=subprocess.DEVNULL)
     elapsed = time.time() - start
     try:
         result = json.loads(proc.stdout)
@@ -99,6 +136,19 @@ def run_one(skill, ev, config, run_dir, model):
                      if not filecmp.cmp(before[k], after[k], shallow=False))
     for rel in created + changed:
         shutil.copy(after[rel], outputs / rel.replace("/", "__"))
+
+    checker = ROOT / "skills" / skill / "evals" / "check.py"
+    graded = ""
+    if mcp_config:
+        shutil.copy(run_dir / "state.json", outputs / "state_after.json")
+    if checker.exists():
+        out = subprocess.run([sys.executable, str(checker), ev["name"], str(fixture), str(run_dir),
+                              str(ROOT / "skills" / skill)], capture_output=True, text=True)
+        if out.returncode:
+            raise RuntimeError(f"check.py failed for {ev['name']}: {out.stderr[-800:]}")
+        (run_dir / "grading.json").write_text(out.stdout)
+        summary = json.loads(out.stdout)["summary"]
+        graded = f", graded {summary['passed']}/{summary['total']}"
 
     usage = result.get("usage") or {}
     tokens = sum(usage.get(k, 0) for k in ("input_tokens", "output_tokens",
@@ -123,7 +173,7 @@ def run_one(skill, ev, config, run_dir, model):
             "assertions": ev.get("expectations", [])}
     (run_dir / "eval_metadata.json").write_text(json.dumps(meta, indent=2))
     (run_dir.parent.parent / "eval_metadata.json").write_text(json.dumps(meta, indent=2))
-    return f"{ev['name']}/{config}/{run_dir.name}: {elapsed:.0f}s, {len(created)} created, {len(changed)} changed"
+    return f"{ev['name']}/{config}/{run_dir.name}: {elapsed:.0f}s, {len(created)} created, {len(changed)} changed{graded}"
 
 
 def main():

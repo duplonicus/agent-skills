@@ -1,0 +1,102 @@
+{
+  "skill_name": "todo-list",
+  "evals": [
+    {
+      "id": 1,
+      "name": "add-to-existing",
+      "prompt": "put paper towels and coffee on my costco list",
+      "expected_output": "Two items added to Costco with their history entries, nothing else touched, a one-line reply.",
+      "files": [
+        "evals/files/add-to-existing"
+      ],
+      "expectations": [
+        "Paper towels and coffee are each on the Costco list exactly once",
+        "The two new items have every field the page expects (list, text, done, created, doneAt, order)",
+        "Each new item has a history entry reading exactly Added “<item text>”, on costco, marked as written by claude",
+        "Nothing that was already there changed: existing items, lists and history are identical",
+        "The page was not republished",
+        "The reply is at most two lines and names the Costco list"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "new-list-when-nothing-close",
+      "prompt": "add sponges to my hardware store list",
+      "expected_output": "No existing list is close to 'hardware store', so the list is made, sponges goes on it, and the reply says a list was made.",
+      "files": [
+        "evals/files/new-list-when-nothing-close"
+      ],
+      "expectations": [
+        "One new list was made, named for the hardware store, ordered after the existing lists",
+        "Sponges is on the new list, and on no other list",
+        "History has an entry for making the list and an entry for adding the item",
+        "Nothing that was already there changed",
+        "The reply tells the user a new list was made",
+        "The page was not republished"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ask-when-a-list-might-match",
+      "prompt": "put a furnace filter on my home depot list",
+      "expected_output": "There is a Hardware list that might be what 'home depot' means, so nothing is written and the reply asks which list.",
+      "files": [
+        "evals/files/ask-when-a-list-might-match"
+      ],
+      "expectations": [
+        "Nothing was written: items, lists and history are identical to before",
+        "The reply asks the user a question",
+        "The reply names the Hardware list as the possible match",
+        "The live lists were read before answering"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "duplicate-and-done",
+      "prompt": "we're out of milk and coffee, put them on the costco list",
+      "expected_output": "Coffee is already open on the list, so it is not added again. Milk is in Done, so it is unchecked instead of duplicated.",
+      "files": [
+        "evals/files/duplicate-and-done"
+      ],
+      "expectations": [
+        "Coffee is on the Costco list once, not twice",
+        "The existing milk item was unchecked (done false, doneAt null) instead of a second one being added",
+        "History has an uncheck entry for the milk",
+        "The Costco list still has three items",
+        "The reply says coffee was already on the list"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "delete-is-restorable",
+      "prompt": "take eggs off the shopping list",
+      "expected_output": "Eggs is deleted with a history entry whose snapshot lets the page restore it.",
+      "files": [
+        "evals/files/delete-is-restorable"
+      ],
+      "expectations": [
+        "Eggs is gone from the Shopping list",
+        "Bread and Butter are untouched",
+        "History has a delete entry whose snapshot can restore Eggs: its original id and every original field",
+        "The reply is at most two lines",
+        "The page was not republished"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "set-up-from-nothing",
+      "prompt": "can you make me a checklist for the camping trip? tent, stove, headlamps so far",
+      "expected_output": "No list page exists yet: one is published with a database, and the items are seeded through the database, not written into the page.",
+      "files": [
+        "evals/files/set-up-from-nothing"
+      ],
+      "expectations": [
+        "Exactly one artifact was published, with a database capability",
+        "The published page does not hardcode the items; they live in the database",
+        "Tent, stove and headlamps each exist as a document in the page's database",
+        "The page was not pinned without the user being asked",
+        "The reply gives the user the page or says how to open it, in at most five lines"
+      ]
+    }
+  ]
+}
