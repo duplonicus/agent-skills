@@ -1,6 +1,6 @@
 # agent-skills
 
-Four skills I wrote and use, in the open [Agent Skills](https://agentskills.io) format: a folder with a `SKILL.md` that any compatible agent can load.
+Skills I wrote and use, in the open [Agent Skills](https://agentskills.io) format: a folder with a `SKILL.md` that any compatible agent can load.
 
 | Skill | What it does |
 |---|---|
