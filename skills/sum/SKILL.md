@@ -1,88 +1,21 @@
 ---
 name: sum
-description: End-of-session handoff. Writes where the work stands into two plain files in the project, NOW.md (overwritten with the current state) and LOG.md (one line appended), so the next session on any agent, surface or machine picks up exactly where this one stopped without re-reading the conversation. Use on /sum, and whenever the user is wrapping up, switching sessions or machines, running low on context, or asks for a handoff, a session summary, "save where we are", "write this down for next time" or "so I can pick this up later", even if they never say "sum". Falls back to a paste-ready summary block when the session cannot write files.
+description: End-of-session handoff. Produces one paste-ready summary block (what was done, current state, what is next, gotchas, files touched) that the user drops in as the first message of the next thread, so a fresh session continues from exactly here without re-reading this one. Use on /sum, and whenever the user is wrapping up, starting a new chat, switching machines or agents, running low on context, or asks for a handoff, a session summary, "save where we are" or "so I can pick this up later", even if they never say "sum". Not for summarising a document or an article.
 license: MIT
 metadata:
   author: duplonicus
-  version: "1.0"
+  version: "2.0"
 ---
 
 # /sum
 
 Goal: zero context drift. The next session should continue from exactly here without re-reading this conversation and without the user explaining anything twice.
 
-State goes in files rather than in a chat message because files are the one thing every later session can reach, whichever agent, surface or machine it runs on. A summary pasted into chat is gone the moment the thread is.
+The reader is an agent that starts cold. It cannot ask you what you meant, it will take every line as fact, and it will act on what it reads. Write for that reader.
 
-## The two files
+## Output
 
-- **`NOW.md` is the current state.** It is overwritten every time, so it never grows and never contradicts itself. A new session reads this one file and knows where things stand.
-- **`LOG.md` is the history.** It is append-only, one line per session, newest at the bottom. It answers "when did we do that?" without bloating NOW.md.
-
-## Where they live
-
-Use the first of these that applies:
-
-1. **The user's standing instructions name a location** (an `AGENTS.md`, `CLAUDE.md` or similar instruction file, saved memory, or something they said in this session). Use it exactly, including any line format they specify.
-2. **State files already exist** in the project (`NOW.md` and `LOG.md` at the project root or in a docs folder). Keep using them where they are.
-3. **Neither.** Create `NOW.md` and `LOG.md` at the project root (the repository top level, or the working directory when there is no repository) and say in your reply that you created them.
-
-Some users also keep an **index**: one `NOW.md` above several projects with a row per project. If one exists, touch it only when a project was added, its one-line status changed, or a cross-project item changed.
-
-## Steps
-
-1. **Read the existing state files first.** Another session may have written to them since this one started. Whatever they say that this session did not make obsolete has to survive your rewrite. Losing someone else's open item is the worst thing this skill can do.
-
-2. **Check the claims you are about to write.** NOW.md is read as fact by a session that cannot ask you questions. For each claim about state (tests passing, deployed, committed, sent, merged), write what you actually observed this session. If a thing was planned or attempted but not confirmed, say so in those words ("not run", "unverified", "failed with ..."). A handoff that says "tests pass" when one still fails costs the next session more than no handoff at all.
-
-3. **Rewrite NOW.md** (overwrite, never append). Facts only, under about 40 lines, with these sections:
-
-   ```markdown
-   # NOW: <project>
-
-   **Updated:** <absolute date, plus the time if you know it> by <agent and surface>
-
-   ## State
-   What is true right now: what works, what is broken, what is running,
-   branch and uncommitted work, versions, ports.
-
-   ## Where things live
-   Every path, URL, ID, draft, scheduled job or open tab a new session
-   would otherwise have to hunt for.
-
-   ## Next
-   1. Ordered by priority. Include anything mentioned but not finished.
-
-   ## Gotchas
-   Non-obvious decisions and pitfalls from this session.
-   ```
-
-   - Write dates as absolute dates. "Tomorrow" and "last week" are meaningless to a session that starts on a different day.
-   - "Next" carries forward every unfinished item: this session's, plus any from the old NOW.md that are still open.
-   - "Gotchas" holds what the next session could not work out from the code or the instruction file, such as why an approach was abandoned or a trap that cost time. Skip anything those files already record.
-
-4. **Append one line to LOG.md.** Use the format already in the file. If the file is new, use:
-
-   ```
-   - YYYY-MM-DD · <agent and surface> · <project> · <what happened, one line>
-   ```
-
-   Never edit or reorder the lines already there.
-
-5. **Update the index**, if there is one, only when something on it changed.
-
-6. **Keep secrets out.** Passwords, tokens, API keys, client secrets and card or account numbers never go into these files, even when they appeared in the conversation. The files get committed, synced and read by other tools. Record where the secret is stored (for example "API token is in `.env`"), never its value.
-
-7. **Reply in two to four lines:** which files you wrote, anything you could not verify, and the line that starts the next session, in a code block:
-
-   ```
-   Read <path to NOW.md> and continue.
-   ```
-
-   Then stop. Do not restate the summary in chat (it is in the file) and do not add sign-off advice.
-
-## Fallback: the session cannot write files
-
-In a chat surface with no file access, or when the project folder is not reachable, produce the handoff as one fenced Markdown block the user can paste as the first message of the next thread:
+One fenced Markdown block, so it copies in a single click, with these sections:
 
 ```markdown
 ## Session summary: <absolute date>
@@ -94,13 +27,28 @@ Completed work, specific: file names, function names, commands run, results.
 One short paragraph on what is true right now.
 
 ### Open / next
-1. Ordered by priority.
+1. Ordered by priority. Everything mentioned but not finished.
 
 ### Key decisions and gotchas
-Non-obvious choices and pitfalls.
+Non-obvious choices and pitfalls the next session must know.
 
-### Files and links
-Everything touched or created: files, docs, drafts, scheduled jobs, URLs, IDs.
+### Files touched
+Every file read, edited or created, plus links, IDs, drafts and scheduled jobs.
 ```
 
-The same rules apply: under about 40 lines, facts only, unverified claims labelled, no secrets. After the block, add one line telling the user which state files to update from it once a session can reach the project.
+Keep the block under about 40 lines. Outside it, write at most two lines: anything the user must do before the next session, or nothing at all. Do not repeat the summary in prose around the block, and do not add sign-off advice.
+
+## What makes a handoff trustworthy
+
+- **Write what was observed, not what was intended.** For every claim about state (tests passing, deployed, committed, sent), give the last thing actually seen this session. If something was changed but not re-checked, say so in those words: "fixture added, suite not re-run; last run was 14 passed, 1 failed". A handoff that says "tests pass" when one still fails costs the next session more than no handoff.
+- **Carry every loose end.** "Open / next" includes this session's unfinished work, anything the user mentioned in passing ("we should also..."), and open items raised earlier that nobody closed. The thing most often lost in a handoff is the task that was not this session's focus.
+- **Keep the constraints attached to the steps.** "Import the list" is wrong if the user said "not until DNS is verified". Order and conditions are part of the task.
+- **Use absolute dates.** "Tomorrow" and "next Tuesday" mean something else by the time the block is read. Convert them, and keep the user's original deadline wording if it carried a condition.
+- **Flag what is unconfirmed.** A number the user wants to double-check, or an assumption nobody verified, is labelled as such next to where it appears.
+- **Explain abandoned approaches.** If something was tried and dropped, say why in one line, so the next session does not try it again.
+- **Leave secrets out.** Passwords, tokens, API keys and account numbers never go in the block, even when they appeared in the conversation. The block gets pasted into new threads and saved in notes. Say where the secret is stored ("token is in `.env`"), never its value.
+- **Skip what is already written down.** Anything in the project's instruction file or README does not need repeating. Facts only, no commentary on how the session went.
+
+## If the user keeps handoffs somewhere
+
+Some users have standing instructions about where session notes go (a line in an `AGENTS.md` or `CLAUDE.md`, a notes file, a memory system). When they do, save the same summary there as they describe, and still show the block in the reply. Without such instructions, write no files: the block is the deliverable.

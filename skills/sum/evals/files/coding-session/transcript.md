@@ -7,7 +7,7 @@ Working directory: the `project/` folder next to this file.
 
 **User:** morning. finance is still complaining about FIN-212, the yen rounding thing. can you dig in
 
-**Assistant:** Read `NOW.md`, `app/rates.py` and `tests/test_rates.py`. The cause is in `convert()`: it multiplies two floats and calls `round(x, 2)` for every currency, including JPY, which has no minor unit. Two separate problems: float error, and two decimals applied to a zero-decimal currency.
+**Assistant:** Read `app/rates.py` and `tests/test_rates.py`. The cause is in `convert()`: it multiplies two floats and calls `round(x, 2)` for every currency, including JPY, which has no minor unit. Two separate problems: float error, and two decimals applied to a zero-decimal currency.
 
 **User:** ok fix both. finance wants bankers rounding btw, they said that last week
 
@@ -35,7 +35,7 @@ I'd rather not have a unit test call the live API, though: it makes the suite sl
 
 **Assistant:** No, I have not re-run the suite since adding the fixture. The last actual run is the one above: 14 passed, 1 failed.
 
-**User:** ok dont bother right now, i need to head out in a sec. two other things. one, we should deploy this to staging once its green, use the smoke test. two, i talked to priya, the password rotation deadline is still the 20th, nobody has started it
+**User:** ok dont bother right now, i need to head out in a sec. two other things. one, we should deploy this to staging once its green, use the smoke test (staging has a self-signed cert so it needs --insecure). two, i talked to priya, the staging db password rotation is still due the 20th and nobody has started it. steps are in docs/runbook.md section 4
 
 **Assistant:** Noted both. Nothing is deployed from this branch yet: staging is still v0.8.2 from `main`. The rotation is untouched this session.
 

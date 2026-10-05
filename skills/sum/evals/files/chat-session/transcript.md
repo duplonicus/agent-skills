@@ -1,7 +1,7 @@
 # Session transcript
 
 Topic: a 20-minute conference talk. Date: Monday 2026-09-21. Agent: an assistant in a phone chat app. This surface has no file tools and cannot reach the user's computer.
-The user keeps a project folder on their laptop at `~/talks/pagerless/` with a `NOW.md` and `LOG.md` in it, which a different session maintains.
+The user will continue this on their laptop later, in a different app.
 
 ---
 

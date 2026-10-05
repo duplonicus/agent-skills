@@ -1,7 +1,7 @@
 # Session transcript
 
 Project: moving a pottery studio newsletter from Mailchimp to Buttondown. Date: Thursday 2026-05-07. Agent: Claude in a desktop app with file access to the project folder.
-Working directory: the `project/` folder next to this file. There are no state files yet; this is the first session on this project.
+Working directory: the `project/` folder next to this file. This is the first session on this project.
 
 ---
 

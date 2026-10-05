@@ -5,7 +5,7 @@ Three skills I wrote and use, in the open [Agent Skills](https://agentskills.io)
 | Skill | What it does |
 |---|---|
 | [`guided-tour`](skills/guided-tour/SKILL.md) | Teaches someone a web app live in their own browser. The agent navigates and spotlights each control, explains it, sets a small try-it task, then stops and waits at every stop. The user makes every click that changes anything. |
-| [`sum`](skills/sum/SKILL.md) | End-of-session handoff. Writes the current state to `NOW.md` and one line to `LOG.md`, so the next session on any agent or machine continues without re-reading the conversation. |
+| [`sum`](skills/sum/SKILL.md) | End-of-session handoff. One paste-ready block (what was done, current state, what is next, gotchas, files touched) that starts the next thread, so a fresh session continues without re-reading this one. |
 | [`critique`](skills/critique/SKILL.md) | Honest post-mortem of a session: the agent's own process mistakes and the work product as its reader will see it, with evidence, ending in rules for next time. |
 
 ## guided-tour
@@ -26,7 +26,7 @@ It needs an agent with browser tools that can read the open page and run JavaScr
 
 Both are small on purpose. What they add over a capable agent with no skill is consistency: the same files, the same shape, the same rules every time.
 
-`sum` rests on two files with different jobs. `NOW.md` is overwritten, so it is always the current truth and never grows. `LOG.md` is append-only, one line per session. The skill's rules are the ones that bite in practice: read the existing state first so another session's open items survive, write only what was observed ("14 passed, 1 failed, not re-run" instead of "tests pass"), use absolute dates, and keep secrets out.
+`sum` writes for a reader that starts cold and takes every line as fact. Its rules are the ones that bite in practice: report what was observed ("14 passed, 1 failed, not re-run" instead of "tests pass"), carry every loose end including the ones that were not this session's focus, keep conditions attached to their steps, use absolute dates, and keep secrets out.
 
 `critique` asks for evidence behind every finding (a quote or a file and line), scales to what happened so a clean session gets a short answer, and reports without fixing: the user decides what is worth acting on.
 
@@ -38,16 +38,16 @@ Each scenario was run with the skill and without it, three times each, and grade
 
 | Skill | With the skill | No skill | Where the gap is |
 |---|---|---|---|
-| `sum` | 72 / 72 | 66 / 72 | All six misses are about the reply: it should be short and end with the line that starts the next session. |
+| `sum` | 90 / 90 | 72 / 90 | 15 of the 18 misses are shape: no paste-ready block, or a saved handoff over the length limit. The other 3 are a deadline left as "the 20th". One scenario showed no gap at all. |
 | `critique` | 72 / 72 | 55 / 72 | 14 of the 17 misses are in the coding post-mortem: no one-line verdict, no evidence table, no rules. |
 
 Counts are expectations passed, summed over 3 scenarios x 3 runs. Measured 2026-10-05 on Claude Opus 5.5 through `claude -p --restricted`, which hides the author's own settings and instruction files from both configurations. The grader was a separate agent session that could not see which configuration produced a run. Per-run grades and evidence are in `skills/<name>/evals/results/`.
 
 Read these numbers with their limits:
 
-- **They measure consistency more than insight.** I wrote the expectations, and several check the skill's own output shape. With no skill the model still caught the main problems in every scenario: the untested "tests pass", the open item from another session, the cover letter's 400 that should have been 40.
+- **They measure consistency more than insight.** I wrote the expectations, and several check the skill's own output shape. With no skill the model still caught the main problems in every scenario: the untested "tests pass", the side task nobody had started, the cover letter's 400 that should have been 40. A reply with no paste block also fails three `sum` expectations at once, which overstates that gap.
 - **Three scenarios per skill, one model.** The grader also flagged expectations that passed for every run in both configurations, so they separate nothing.
-- **The skills cost a little more.** Mean cost per run was $0.138 with `sum` against $0.123 without, and $0.134 with `critique` against $0.098 without.
+- **The skills cost a little more.** Mean cost per run was $0.125 with `sum` against $0.108 without, and $0.134 with `critique` against $0.098 without.
 
 The evals did change one skill. In the first round `critique` padded a clean session with marginal findings and scored 4 of 6 there on its single run; a section on proportion fixed it (18 of 18 over three runs).
 
