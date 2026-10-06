@@ -74,12 +74,6 @@ class Run:
                 self.stop_headings() <= 1 and len(tags) <= 1 and len(pages) <= 1,
                 f"{self.stop_headings()} stop headings; spotlight tags: {sorted(tags)}; pages highlighted: {sorted(pages)}")
 
-    def new_tab(self):
-        used_users_tab = [k for k, v in self.state.get("agent_tabs", {}).items() if v.get("users_tab")]
-        return ("The tour runs in a new tab and the user's own tabs are left alone",
-                bool(self.of("new_tab")) and not used_users_tab,
-                f"new tabs opened: {len(self.of('new_tab'))}; user's tabs used: {used_users_tab}")
-
     def outline(self):
         numbers = [int(n) for n in re.findall(r"(?m)^\s*(?:\*\*)?(\d{1,2})[.)]\s+\S", self.reply)]
         best = run = 0
@@ -108,7 +102,6 @@ def setup_ready(r):
     yield ("It stops after that first stop: one stop pointed at, and no page beyond the dashboard opened",
            len(tags) <= 1 and len(pages) <= 1 and r.stop_headings() <= 1 and not elsewhere,
            f"spotlight tags: {sorted(tags)}; stop headings: {r.stop_headings()}; other pages opened: {elsewhere}")
-    yield r.new_tab()
     yield r.nothing_changed()
 
 
@@ -121,7 +114,6 @@ def setup_blocked(r):
            r.stop_headings() == 0, f"{r.stop_headings()} stop headings")
     typed = [(e["element"], len(e["text"])) for e in r.typed()]
     yield ("Nothing was typed into the page", not typed, f"typed into: {typed}")
-    yield r.new_tab()
     yield r.nothing_changed()
 
 

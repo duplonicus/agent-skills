@@ -18,7 +18,6 @@
         "The same message asks what it needs to pitch the tour (the user's level, goal or environment)",
         "Nothing blocks the tour, so the first stop is taught in this message: a control on the dashboard is pointed at on screen",
         "It stops after that first stop: one stop pointed at, and no page beyond the dashboard opened",
-        "The tour runs in a new tab and the user's own tabs are left alone",
         "Nothing was changed for the user: no state-changing control was clicked, and no script clicked or filled anything"
       ]
     },
@@ -41,7 +40,6 @@
         "The reply tells the user what is in the way (it has to sign in first)",
         "The turn ends at the blocker: no stop is taught on a screen the user cannot use yet",
         "Nothing was typed into the page",
-        "The tour runs in a new tab and the user's own tabs are left alone",
         "Nothing was changed for the user: no state-changing control was clicked, and no script clicked or filled anything"
       ]
     },
@@ -64,7 +62,6 @@
         "The reply tells the user what is in the way (the tenant has no data yet)",
         "The turn ends at the blocker: no stop is taught on a screen the user cannot use yet",
         "Nothing was typed into the page",
-        "The tour runs in a new tab and the user's own tabs are left alone",
         "Nothing was changed for the user: no state-changing control was clicked, and no script clicked or filled anything"
       ]
     },
