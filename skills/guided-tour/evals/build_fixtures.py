@@ -213,7 +213,7 @@ def main():
 
     # --- set-up turn -------------------------------------------------------
     scenario("setup-app-ready", ask,
-             "A numbered outline of 6 to 10 stops with the goal/level/environment questions in the same message, and, because nothing blocks, the first stop taught in that same message. One stop only, in a new tab, nothing changed.",
+             "A numbered outline of 6 to 10 stops with the goal/level/environment questions in the same message, and, because nothing blocks, the first stop taught in that same message. One stop only, nothing changed.",
              finish(app()), meta={"kind": "setup_ready", "first_page": "/dashboard"})
 
     pages = signed_out(app())

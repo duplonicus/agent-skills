@@ -5,7 +5,7 @@
       "id": 1,
       "name": "setup-app-ready",
       "prompt": "i start a helpdesk job monday and they use Acme Cloud Console (https://console.acme.test). can you walk me through it?",
-      "expected_output": "A numbered outline of 6 to 10 stops with the goal/level/environment questions in the same message, and, because nothing blocks, the first stop taught in that same message. One stop only, in a new tab, nothing changed.",
+      "expected_output": "A numbered outline of 6 to 10 stops with the goal/level/environment questions in the same message, and, because nothing blocks, the first stop taught in that same message. One stop only, nothing changed.",
       "files": [
         "evals/files/setup-app-ready"
       ],
