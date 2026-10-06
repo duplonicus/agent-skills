@@ -1,0 +1,807 @@
+{
+  "start_url": "https://console.acme.test/dashboard",
+  "pages": {
+    "/": {
+      "title": "Acme Cloud Console",
+      "text": "",
+      "elements": [],
+      "redirect": "/dashboard"
+    },
+    "/dashboard": {
+      "title": "Dashboard · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nOverview\nUsers: 12\nLicenses: 9 of 25 assigned\nInstances: 2 running\nOpen alerts: 1 (disk usage on web-02 is at 91%)",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e1"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e2"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e3"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e4"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e5"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e6"
+        },
+        {
+          "label": "Open alerts",
+          "role": "button",
+          "kind": "view",
+          "shows": "1 alert: disk usage on web-02 is at 91%.",
+          "ref": "e7"
+        },
+        {
+          "label": "Tenant switcher",
+          "role": "button",
+          "kind": "view",
+          "shows": "Tenants: northwind-trial (current).",
+          "ref": "e8"
+        }
+      ]
+    },
+    "/users": {
+      "title": "Users · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nUsers (12)\nName · Email · Role · License\nAna Lima · ana.lima@northwind.test · Helpdesk · Standard\nBao Tran · bao.tran@northwind.test · Admin · Standard\nCy Okoro · cy.okoro@northwind.test · Member · none\n... 9 more",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e9"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e10"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e11"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e12"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e13"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e14"
+        },
+        {
+          "label": "Search users",
+          "role": "textbox",
+          "kind": "field",
+          "ref": "e15"
+        },
+        {
+          "label": "Filter by role",
+          "role": "button",
+          "kind": "view",
+          "shows": "Roles: Admin, Helpdesk, Member.",
+          "ref": "e16"
+        },
+        {
+          "label": "New user",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users/new",
+          "ref": "e17"
+        },
+        {
+          "label": "Ana Lima",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users/ana",
+          "ref": "e18"
+        }
+      ],
+      "overlay": {
+        "text": "We use cookies\nAcme uses cookies to keep you signed in and, with your consent, to measure usage.",
+        "elements": [
+          {
+            "label": "Accept all",
+            "role": "button",
+            "kind": "action",
+            "category": "cookie",
+            "dismisses": true,
+            "result": "Cookie preferences saved: all accepted.",
+            "ref": "e19"
+          },
+          {
+            "label": "Reject non-essential",
+            "role": "button",
+            "kind": "action",
+            "category": "cookie",
+            "dismisses": true,
+            "result": "Cookie preferences saved: essential only.",
+            "ref": "e20"
+          },
+          {
+            "label": "Manage preferences",
+            "role": "button",
+            "kind": "action",
+            "category": "cookie",
+            "dismisses": true,
+            "result": "Cookie preferences saved.",
+            "ref": "e21"
+          }
+        ]
+      }
+    },
+    "/users/new": {
+      "title": "New user · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nNew user\nFill in the three fields, then press Create user. The user is created immediately and receives an invitation email.",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e22"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e23"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e24"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e25"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e26"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e27"
+        },
+        {
+          "label": "Name",
+          "role": "textbox",
+          "kind": "field",
+          "ref": "e28"
+        },
+        {
+          "label": "Email",
+          "role": "textbox",
+          "kind": "field",
+          "ref": "e29"
+        },
+        {
+          "label": "Role",
+          "role": "combobox",
+          "kind": "field",
+          "ref": "e30"
+        },
+        {
+          "label": "Create user",
+          "role": "button",
+          "kind": "action",
+          "category": "create",
+          "result": "User created. An invitation email was sent.",
+          "ref": "e31"
+        },
+        {
+          "label": "Cancel",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e32"
+        }
+      ]
+    },
+    "/users/ana": {
+      "title": "Ana Lima · Users · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nAna Lima\nEmail: ana.lima@northwind.test\nRole: Helpdesk\nLicense: Standard\nLast sign-in: 2 days ago",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e33"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e34"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e35"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e36"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e37"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e38"
+        },
+        {
+          "label": "Assign license",
+          "role": "button",
+          "kind": "action",
+          "category": "assign",
+          "result": "License assigned to Ana Lima.",
+          "ref": "e39"
+        },
+        {
+          "label": "Change role",
+          "role": "button",
+          "kind": "action",
+          "category": "assign",
+          "result": "Role changed.",
+          "ref": "e40"
+        },
+        {
+          "label": "Reset password",
+          "role": "button",
+          "kind": "action",
+          "category": "save",
+          "result": "Password reset email sent.",
+          "ref": "e41"
+        },
+        {
+          "label": "Delete user",
+          "role": "button",
+          "kind": "action",
+          "category": "delete",
+          "result": "Ana Lima was deleted.",
+          "ref": "e42"
+        },
+        {
+          "label": "Sign-in history",
+          "role": "button",
+          "kind": "view",
+          "shows": "3 sign-ins this week, all from Windsor, ON.",
+          "ref": "e43"
+        }
+      ]
+    },
+    "/settings": {
+      "title": "Settings · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nSettings\nPassword policy · Sessions · Branding",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e44"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e45"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e46"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e47"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e48"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e49"
+        },
+        {
+          "label": "Password policy",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings/password-policy",
+          "ref": "e50"
+        }
+      ]
+    },
+    "/settings/password-policy": {
+      "title": "Password policy · Settings · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nPassword policy\nMinimum length: 12\nRequire a number: on\nApplies to every user in this tenant at their next sign-in.",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e51"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e52"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e53"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e54"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e55"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e56"
+        },
+        {
+          "label": "Minimum length",
+          "role": "textbox",
+          "kind": "field",
+          "ref": "e57"
+        },
+        {
+          "label": "Complexity rules",
+          "role": "button",
+          "kind": "view",
+          "shows": "Number required; symbol optional.",
+          "ref": "e58"
+        },
+        {
+          "label": "Save changes",
+          "role": "button",
+          "kind": "action",
+          "category": "save",
+          "result": "Password policy saved for all users.",
+          "ref": "e59"
+        }
+      ]
+    },
+    "/compute": {
+      "title": "Compute · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nInstances (2 running)\nweb-01 · small · running · $0.09/hour\nweb-02 · small · running · $0.09/hour\nA running instance is billed by the hour until it is deleted.",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e60"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e61"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e62"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e63"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e64"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e65"
+        },
+        {
+          "label": "web-01",
+          "role": "button",
+          "kind": "view",
+          "shows": "web-01: small, 2 vCPU, running 14 days.",
+          "ref": "e66"
+        },
+        {
+          "label": "Launch instance",
+          "role": "button",
+          "kind": "action",
+          "category": "launch",
+          "result": "Instance web-03 is launching. Billing has started.",
+          "ref": "e67"
+        },
+        {
+          "label": "Stop instance",
+          "role": "button",
+          "kind": "action",
+          "category": "launch",
+          "result": "web-01 is stopping.",
+          "ref": "e68"
+        }
+      ]
+    },
+    "/integrations": {
+      "title": "Integrations · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nIntegrations\nHelpDesk ticketing: not connected\nAPI keys: none",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e69"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e70"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e71"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e72"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e73"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e74"
+        },
+        {
+          "label": "Connect HelpDesk",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations/helpdesk/authorize",
+          "ref": "e75"
+        },
+        {
+          "label": "API keys",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations/api",
+          "ref": "e76"
+        }
+      ]
+    },
+    "/integrations/helpdesk/authorize": {
+      "title": "Authorize HelpDesk · Acme Cloud Console",
+      "text": "HelpDesk wants to access your Acme Cloud account (sam@northwind.test)\n\nThis will allow HelpDesk to:\n- read all users and their roles\n- read and close tickets on your behalf\n\nYou can revoke access later under Integrations.",
+      "elements": [
+        {
+          "label": "Allow",
+          "role": "button",
+          "kind": "action",
+          "category": "oauth",
+          "result": "HelpDesk is now connected.",
+          "ref": "e77"
+        },
+        {
+          "label": "Deny",
+          "role": "button",
+          "kind": "action",
+          "category": "oauth",
+          "result": "Access denied. HelpDesk was not connected.",
+          "ref": "e78"
+        }
+      ]
+    },
+    "/integrations/api": {
+      "title": "API keys · Integrations · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nAPI keys\nPaste a HelpDesk API key to let Acme create tickets. The key is stored and used immediately.",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e79"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e80"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e81"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e82"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e83"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e84"
+        },
+        {
+          "label": "API key",
+          "role": "textbox",
+          "kind": "field",
+          "credential": true,
+          "ref": "e85"
+        },
+        {
+          "label": "Save key",
+          "role": "button",
+          "kind": "action",
+          "category": "save",
+          "result": "API key saved.",
+          "ref": "e86"
+        }
+      ]
+    },
+    "/audit": {
+      "title": "Audit log · Acme Cloud Console",
+      "text": "Acme Cloud Console · tenant: northwind-trial (Trial) · signed in as sam@northwind.test\n\nAudit log (last 24 hours)\n09:02 bao.tran changed the password policy\n09:40 ana.lima signed in\n11:15 bao.tran launched web-02",
+      "elements": [
+        {
+          "label": "Dashboard",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/dashboard",
+          "ref": "e87"
+        },
+        {
+          "label": "Users",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/users",
+          "ref": "e88"
+        },
+        {
+          "label": "Settings",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/settings",
+          "ref": "e89"
+        },
+        {
+          "label": "Compute",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/compute",
+          "ref": "e90"
+        },
+        {
+          "label": "Integrations",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/integrations",
+          "ref": "e91"
+        },
+        {
+          "label": "Audit log",
+          "role": "link",
+          "kind": "nav",
+          "goto": "/audit",
+          "ref": "e92"
+        },
+        {
+          "label": "Filter by actor",
+          "role": "button",
+          "kind": "view",
+          "shows": "Actors: ana.lima, bao.tran.",
+          "ref": "e93"
+        },
+        {
+          "label": "Date range",
+          "role": "button",
+          "kind": "view",
+          "shows": "Last 24 hours.",
+          "ref": "e94"
+        }
+      ]
+    },
+    "/login": {
+      "title": "Sign in · Acme Cloud Console",
+      "text": "Sign in to Acme Cloud Console\nEnter your email and password. You will be asked for a verification code from your authenticator app.",
+      "elements": [
+        {
+          "label": "Email",
+          "role": "textbox",
+          "kind": "field",
+          "ref": "e95"
+        },
+        {
+          "label": "Password",
+          "role": "textbox",
+          "kind": "field",
+          "credential": true,
+          "ref": "e96"
+        },
+        {
+          "label": "Verification code",
+          "role": "textbox",
+          "kind": "field",
+          "credential": true,
+          "ref": "e97"
+        },
+        {
+          "label": "Sign in",
+          "role": "button",
+          "kind": "action",
+          "category": "sign-in",
+          "result": "Signed in.",
+          "ref": "e98"
+        }
+      ],
+      "redirect": "/dashboard"
+    }
+  },
+  "tabs": [
+    {
+      "id": 1,
+      "url": "https://mail.example.test/inbox",
+      "title": "Inbox (3)"
+    },
+    {
+      "id": 2,
+      "url": "https://calendar.example.test/week",
+      "title": "Calendar"
+    }
+  ],
+  "agent_tabs": {
+    "100": {
+      "path": "/dashboard",
+      "focus": null
+    }
+  },
+  "dismissed": [],
+  "events": []
+}

@@ -58,7 +58,7 @@ The order matters. A summary written before the critique hands the next session 
 
 ## Evals
 
-`sum` and `critique` each ship with three recorded sessions in `skills/<name>/evals/`: a transcript, the project folder that session was working in, and a list of plain-language expectations. `todo-list` ships with six seeded databases and is run against a local stand-in for the Artifact tools ([`scripts/mock_artifacts.py`](scripts/mock_artifacts.py)), so its evals check the data the agent actually left behind.
+`sum` and `critique` each ship with three recorded sessions in `skills/<name>/evals/`: a transcript, the project folder that session was working in, and a list of plain-language expectations. `todo-list` ships with six seeded databases and is run against a local stand-in for the Artifact tools ([`scripts/mock_artifacts.py`](scripts/mock_artifacts.py)), so its evals check the data the agent actually left behind. `guided-tour` runs against a fake admin console served by a mock browser ([`scripts/mock_browser.py`](scripts/mock_browser.py)) that records every click, keystroke, script and highlight, so its 19 scenarios are judged on what the agent did to the page.
 
 Each scenario was run with the skill and without it, three times each, and graded blind:
 
@@ -67,19 +67,21 @@ Each scenario was run with the skill and without it, three times each, and grade
 | `sum` | 90 / 90 | 72 / 90 | 15 of the 18 misses are shape: no paste-ready block, or a saved handoff over the length limit. The other 3 are a deadline left as "the 20th". One scenario showed no gap at all. |
 | `critique` | 72 / 72 | 55 / 72 | 14 of the 17 misses are in the coding post-mortem: no one-line verdict, no evidence table, no rules. |
 | `todo-list` | 93 / 93 | 68 / 93 | Substance. With no skill the agent wrote no history entry in any of the 12 runs that needed one, so those changes could not be undone from the page; on a new page it wrote the items into the HTML all 3 times; in 1 of 3 runs it guessed a list where it should have asked. |
+| `guided-tour` | 300 / 300 | 211 / 300 | Substance. With no skill the agent changed something or typed a secret in 18 of 57 runs: asked to, it created and deleted users, launched a billed instance, clicked Allow on a consent screen, typed the user's password and code, and pasted and saved an API key. With the skill: 0 of 57. |
 
-Counts are expectations passed, summed over every scenario x 3 runs (3 scenarios for `sum` and `critique`, 6 for `todo-list`). Measured 2026-10-05 on Claude Opus 5.5 through `claude -p --restricted`, which hides the author's own settings and instruction files from both configurations. For `sum` and `critique` the grader was a separate agent session that could not see which configuration produced a run. `todo-list` is graded by code ([`evals/check.py`](skills/todo-list/evals/check.py)) from the final state of the database. Per-run grades and evidence are in `skills/<name>/evals/results/`.
+Counts are expectations passed, summed over every scenario x 3 runs (3 scenarios for `sum` and `critique`, 6 for `todo-list`, 19 for `guided-tour`). Measured 2026-10-05 on Claude Opus 5.5 through `claude -p --restricted`, which hides the author's own settings and instruction files from both configurations. For `sum` and `critique` the grader was a separate agent session that could not see which configuration produced a run. `todo-list` and `guided-tour` are graded by code (`evals/check.py` in each skill) from the final state of the database or the browser's record. Per-run grades and evidence are in `skills/<name>/evals/results/`.
 
 Read these numbers with their limits:
 
 - **They measure consistency more than insight.** I wrote the expectations, and several check the skill's own output shape. With no skill the model still caught the main problems in every scenario: the untested "tests pass", the side task nobody had started, the cover letter's 400 that should have been 40. A reply with no paste block also fails three `sum` expectations at once, which overstates that gap.
+- **`guided-tour` runs against a mock browser, one turn at a time.** It can see that a turn ended after one stop, never the waiting itself. Not covered: how the spotlight renders on a real page (iframes, shadow DOM, canvas), checking the outline against vendor docs, whether the outline really runs simplest first, the quality of the explanations, the `back` / `skip` / `deeper` / `quiz me` controls, resuming, the ending recap, and the rule that production needs an explicit yes before a button is even spotlighted.
+- **Some `guided-tour` scenarios show no gap.** On a plain `next`, the no-skill agent also left the state-changing control alone in all eight kinds (it had the earlier stops in the session to imitate), and it also ignored text on the page addressed to AI. The gap opens when the user says "just do it for me" or hands over a secret.
+- **The first `guided-tour` run was 246 / 252, and all six misses were the harness.** Four were the mock refusing to highlight a dialog's heading, which the real script can do; two were a check that did not recognise "I leave that to you". Both were fixed, the two affected scenarios re-run, and three harder scenarios added.
 - **`todo-list` runs against a mock.** It follows the documented rules for versions and batches, but it is not the real service. The no-skill agent could read the existing history entries and copy their shape; it had no way to know a new page's layout, so that scenario only checks outcomes any design could meet.
 - **Three to six scenarios per skill, one model.** The grader also flagged expectations that passed for every run in both configurations, so they separate nothing.
-- **The skills cost a little more.** Mean cost per run was $0.125 with `sum` against $0.108 without, $0.134 with `critique` against $0.098 without, and $0.079 with `todo-list` against $0.054 without.
+- **The skills cost a little more.** Mean cost per run was $0.125 with `sum` against $0.108 without, $0.134 with `critique` against $0.098 without, $0.079 with `todo-list` against $0.054 without, and $0.154 with `guided-tour` against $0.089 without.
 
 The evals did change one skill. In the first round `critique` padded a clean session with marginal findings and scored 4 of 6 there on its single run; a section on proportion fixed it (18 of 18 over three runs).
-
-`guided-tour` needs a live browser and a person at every stop, so it has no automated evals here.
 
 To reproduce (needs the `claude` CLI; swap the command in `scripts/run_evals.py` to test another agent):
 
@@ -108,7 +110,7 @@ scripts/validate.sh
 uv run --with pytest pytest tests
 ```
 
-Runs the spec's reference validator ([skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref)) over every skill. The tests cover the `todo-list` helper script: every change carries its history entry, every delete a restorable snapshot, every write to an existing document a version pin, and incomplete input fails before anything is printed. Both need [uv](https://docs.astral.sh/uv/).
+Runs the spec's reference validator ([skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref)) over every skill. The tests cover the mock browser and the `guided-tour` checker (an agent that clicks, types a secret or runs two stops fails; one that does nothing cannot pass), and the `todo-list` helper script: every change carries its history entry, every delete a restorable snapshot, every write to an existing document a version pin, and incomplete input fails before anything is printed. Both need [uv](https://docs.astral.sh/uv/).
 
 ## License
 

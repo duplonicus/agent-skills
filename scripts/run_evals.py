@@ -15,11 +15,14 @@ instruction files and confines file tools to the sandbox, so neither
 configuration can see the author's own setup. Change agent_cmd() to test
 another agent.
 
-Two kinds of fixture, both under skills/<skill>/evals/files/<name>/:
-  transcript.md + project/   a recorded session; the agent continues it
-  state.json                 a seeded database for scripts/mock_artifacts.py;
-                             the agent starts fresh with mock Artifact and
-                             ArtifactData tools and a shell for python3
+A fixture lives under skills/<skill>/evals/files/<name>/ and is made of:
+  transcript.md   optional: a recorded session the agent continues. Without
+                  it the agent starts a fresh conversation.
+  project/        optional: the folder that session was working in
+  state.json      optional: a seeded database for scripts/mock_artifacts.py
+                  (mock Artifact and ArtifactData tools, plus python3)
+  browser.json    optional: a fake web app for scripts/mock_browser.py
+                  (mock browser tools; every click and keystroke is recorded)
 
 If the skill has evals/check.py, each run is graded by it (deterministic
 checks on the reply and the final state). Otherwise grade with
@@ -50,7 +53,7 @@ CONFIGS = ("with_skill", "without_skill")
 PROMPT = """You are partway through a working session with a user.
 
 `transcript.md` in the current directory is the conversation so far. Read it and treat it as your own history in this session. The session's project folder is `./project`.
-{note}{skill}
+{tools}{note}{skill}
 Read and write only inside the current directory.
 
 The user's next message is:
@@ -61,8 +64,7 @@ Respond as you would in that session, doing whatever file work the message calls
 
 FRESH_PROMPT = """A user is starting a conversation with you.
 
-The Artifact and ArtifactData tools are available in this session as `mcp__artifacts__Artifact` and `mcp__artifacts__ArtifactData`. You can run `python3` in the shell.
-{note}{skill}
+{tools}{note}{skill}
 Work only inside the current directory.
 
 The user's message is:
@@ -71,16 +73,34 @@ The user's message is:
 
 Respond as you would, using your tools to do what the message calls for. Your final message is your reply to the user."""
 
+# One entry per mock: the state file that selects it, the server script, the
+# tools the agent may use, and the line that tells the agent what it has.
+MOCKS = {
+    "state.json": {
+        "server": "mock_artifacts.py", "name": "artifacts",
+        "tools": "Bash,Read,Write,Edit,Glob,Grep",
+        "allowed": "mcp__artifacts__Artifact,mcp__artifacts__ArtifactData,Bash(python3:*)",
+        "note": "\nThe Artifact and ArtifactData tools are available in this session as `mcp__artifacts__Artifact` and `mcp__artifacts__ArtifactData`. You can run `python3` in the shell.\n",
+    },
+    "browser.json": {
+        "server": "mock_browser.py", "name": "browser",
+        "tools": "Read,Write,Edit,Glob,Grep",
+        "allowed": "mcp__browser__tabs_context_mcp,mcp__browser__tabs_create_mcp,mcp__browser__navigate,"
+                   "mcp__browser__get_page_text,mcp__browser__read_page,mcp__browser__find,"
+                   "mcp__browser__javascript_tool,mcp__browser__computer,mcp__browser__form_input",
+        "note": "\nYou control the user's browser through the `mcp__browser__*` tools, which are already loaded: there is no separate browser skill to read and no ToolSearch step. Web search and web fetch are not available in this session.\n",
+    },
+}
+
 SKILL_LINE = "\nA skill that applies to the user's next message is installed at `./skill/SKILL.md`. Read it first and follow it.\n"
 
 
-def agent_cmd(prompt, model, mcp_config=None):
+def agent_cmd(prompt, model, mcp_config=None, mock=None):
     cmd = ["claude", "-p", prompt, "--restricted", "--strict-mcp-config",
            "--permission-mode", "acceptEdits", "--no-session-persistence",
            "--output-format", "json"]
     if mcp_config:
-        cmd += ["--mcp-config", str(mcp_config), "--tools", "Bash,Read,Write,Edit,Glob,Grep",
-                "--allowedTools", "mcp__artifacts__Artifact,mcp__artifacts__ArtifactData,Bash(python3:*)"]
+        cmd += ["--mcp-config", str(mcp_config), "--tools", mock["tools"], "--allowedTools", mock["allowed"]]
     if model:
         cmd += ["--model", model]
     return cmd
@@ -102,20 +122,22 @@ def run_one(skill, ev, config, run_dir, model):
         shutil.copytree(ROOT / "skills" / skill, sandbox / "skill",
                         ignore=shutil.ignore_patterns("evals"))
     note = f"\n{ev['harness_note']}\n" if ev.get("harness_note") else ""
+    mcp_config = mock = None
+    for state_name, spec in MOCKS.items():
+        if (sandbox / state_name).exists():
+            # The state file sits outside the sandbox so the agent only reaches it through the tools.
+            mock = spec
+            state = run_dir / "state.json"
+            shutil.move(sandbox / state_name, state)
+            mcp_config = run_dir / "mcp.json"
+            mcp_config.write_text(json.dumps({"mcpServers": {spec["name"]: {
+                "command": sys.executable, "args": [str(ROOT / "scripts" / spec["server"])],
+                "env": {"MOCK_STATE": str(state)}}}}))
     template = PROMPT if (fixture / "transcript.md").exists() else FRESH_PROMPT
-    prompt = template.format(note=note, skill=SKILL_LINE if config == "with_skill" else "",
-                             message=ev["prompt"])
-    mcp_config = None
-    if (sandbox / "state.json").exists():
-        # The state file sits outside the sandbox so the agent only reaches it through the tools.
-        state = run_dir / "state.json"
-        shutil.move(sandbox / "state.json", state)
-        mcp_config = run_dir / "mcp.json"
-        mcp_config.write_text(json.dumps({"mcpServers": {"artifacts": {
-            "command": sys.executable, "args": [str(ROOT / "scripts" / "mock_artifacts.py")],
-            "env": {"MOCK_STATE": str(state)}}}}))
+    prompt = template.format(tools=mock["note"] if mock else "", note=note,
+                             skill=SKILL_LINE if config == "with_skill" else "", message=ev["prompt"])
     start = time.time()
-    proc = subprocess.run(agent_cmd(prompt, model, mcp_config), cwd=sandbox, capture_output=True,
+    proc = subprocess.run(agent_cmd(prompt, model, mcp_config, mock), cwd=sandbox, capture_output=True,
                           text=True, timeout=900, stdin=subprocess.DEVNULL)
     elapsed = time.time() - start
     try:
@@ -184,6 +206,8 @@ def main():
     ap.add_argument("--model", default=None)
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--only", help="run a single eval by name")
+    ap.add_argument("--regrade", action="store_true",
+                    help="re-run evals/check.py over the runs already in this iteration; the agent is not called")
     args = ap.parse_args()
 
     evals = json.loads((ROOT / "skills" / args.skill / "evals" / "evals.json").read_text())["evals"]
@@ -195,6 +219,17 @@ def main():
         for config in CONFIGS:
             for k in range(1, args.runs + 1):
                 jobs.append((args.skill, ev, config, ws / f"eval-{ev['name']}" / config / f"run-{k}", args.model))
+    if args.regrade:
+        checker = ROOT / "skills" / args.skill / "evals" / "check.py"
+        for skill, ev, config, run_dir, _ in jobs:
+            if not (run_dir / "outputs").is_dir():
+                continue
+            out = subprocess.run([sys.executable, str(checker), ev["name"], str(ROOT / "skills" / skill / ev["files"][0]),
+                                  str(run_dir), str(ROOT / "skills" / skill)], capture_output=True, text=True, check=True)
+            (run_dir / "grading.json").write_text(out.stdout)
+            summary = json.loads(out.stdout)["summary"]
+            print(f"{ev['name']}/{config}/{run_dir.name}: regraded {summary['passed']}/{summary['total']}")
+        return
     for job in jobs:
         job[3].parent.mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(args.jobs) as pool:
