@@ -86,7 +86,7 @@ The evals did change one skill. In the first round `critique` padded a clean ses
 To reproduce (needs the `claude` CLI; swap the command in `scripts/run_evals.py` to test another agent):
 
 ```bash
-scripts/run_evals.py sum --iteration 1 --runs 3
+scripts/run_evals.py sum --iteration 1 --runs 3     # safe to repeat: finished runs are skipped
 scripts/blind_grading.py pack sum --iteration 1
 # a grader writes grading.json into each anonymous packet, then:
 scripts/blind_grading.py unpack sum --iteration 1

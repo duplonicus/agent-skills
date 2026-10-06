@@ -24,6 +24,9 @@ A fixture lives under skills/<skill>/evals/files/<name>/ and is made of:
   browser.json    optional: a fake web app for scripts/mock_browser.py
                   (mock browser tools; every click and keystroke is recorded)
 
+Runs are resumable: a run that finished is skipped when the same command is
+repeated, so an interrupted batch picks up where it stopped. --force redoes them.
+
 If the skill has evals/check.py, each run is graded by it (deterministic
 checks on the reply and the final state). Otherwise grade with
 scripts/blind_grading.py.
@@ -112,7 +115,12 @@ def snapshot(folder):
     return {p.relative_to(folder).as_posix(): p for p in folder.rglob("*") if p.is_file()}
 
 
-def run_one(skill, ev, config, run_dir, model):
+DONE = ".complete"  # written last, so its presence means every output of the run is on disk
+
+
+def run_one(skill, ev, config, run_dir, model, force=False):
+    if (run_dir / DONE).exists() and not force:
+        return f"{ev['name']}/{config}/{run_dir.name}: already done, skipped (--force to redo)"
     fixture = ROOT / "skills" / skill / ev["files"][0]
     sandbox = run_dir / "sandbox"
     if run_dir.exists():
@@ -195,6 +203,7 @@ def run_one(skill, ev, config, run_dir, model):
             "assertions": ev.get("expectations", [])}
     (run_dir / "eval_metadata.json").write_text(json.dumps(meta, indent=2))
     (run_dir.parent.parent / "eval_metadata.json").write_text(json.dumps(meta, indent=2))
+    (run_dir / DONE).write_text("")
     return f"{ev['name']}/{config}/{run_dir.name}: {elapsed:.0f}s, {len(created)} created, {len(changed)} changed{graded}"
 
 
@@ -206,6 +215,7 @@ def main():
     ap.add_argument("--model", default=None)
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--only", help="run a single eval by name")
+    ap.add_argument("--force", action="store_true", help="redo runs that already finished")
     ap.add_argument("--regrade", action="store_true",
                     help="re-run evals/check.py over the runs already in this iteration; the agent is not called")
     args = ap.parse_args()
@@ -233,7 +243,7 @@ def main():
     for job in jobs:
         job[3].parent.mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(args.jobs) as pool:
-        for line in pool.map(lambda j: run_one(*j), jobs):
+        for line in pool.map(lambda j: run_one(*j, force=args.force), jobs):
             print(line, flush=True)
 
 
