@@ -203,8 +203,7 @@ def main():
 
     scenario("resume-from-the-checklist", "back again. let's pick my practice up where we left off, the guide is project/study-guide.md",
              "Reads the checklist, continues at task 4 (the first unticked one) with a goal and no command, and restates that mailsort is look-only.",
-             {"kind": "resume", "task": 4, "about": "finding the mailsort process ID", "mention": r"process|\bPID\b",
-              "earlier": r"\b1\s*/\s*[59]\b|\btask 1\b"}, done=(1, 2, 3))
+             {"kind": "resume", "task": 4, "about": "finding the mailsort process ID", "mention": r"process|\bPID\b"}, done=(1, 2, 3))
 
     # --- the hint ladder -------------------------------------------------------
     journal = {"task": 2, "tool": "journalctl"}

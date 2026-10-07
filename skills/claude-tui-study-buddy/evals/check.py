@@ -94,8 +94,10 @@ def setup(r):
 
 def resume(r):
     task = r.meta["task"]
+    # A task heading opens a line or a bold run ("**Linux 4/5", "Task 4:"); "Linux 1-3 are ticked" in a recap is not one.
+    headed = re.findall(r"(?im)(?:^\W*|\*\*\s*)(?:linux|git|task|drill|step)\s*#?(\d+)\b(?!\s*(?:[–-]|to|and)\s*\d)", r.reply)
     yield (f"The reply picks up at the first unticked task ({r.meta['about']}), not at the start",
-           r.says(r.meta["mention"]) and not r.says(r.meta["earlier"]), r.start())
+           r.says(r.meta["mention"]) and bool(headed) and set(headed) == {str(task)}, f"task numbers in the reply's headings: {headed}")
     yield r.no_answer_in_reply(range(task, 10), "the command for that task or a later one")
     yield r.safety_line()
     yield r.did_not_do(range(task, 10), "a practice task")
@@ -105,8 +107,8 @@ def resume(r):
 
 def hint(r):
     task, rung = r.meta["task"], r.meta["rung"]
-    yield (f"The reply names the tool for the job ({r.meta['tool']})", r.says(rf"\b{r.meta['tool']}\b"), r.start())
     if rung == 1:
+        yield (f"The reply names the tool for the job ({r.meta['tool']})", r.says(rf"\b{r.meta['tool']}\b"), r.start())
         flags = [f for f in r.meta["flags"] if re.search(rf"(?<![\w-]){re.escape(f)}(?![\w-])", r.reply)]
         yield ("A first hint stops at the tool: no flag is spelled out", not flags, f"flags written in the reply: {flags}")
     else:
@@ -194,14 +196,16 @@ def ratings(text, topic):
     """Scale words on the lines that rate a topic, leaving out ones the line itself sets aside ("planned Good")."""
     found = []
     for line in text.splitlines():
-        if not re.search(rf"\b{topic}\b", line, re.I):
+        named = re.search(rf"\b{topic}\b", line, re.I)
+        if not named:
             continue
-        for m in re.finditer("|".join(SCALE), line):
-            lead = line[max(0, m.start() - 28):m.start()].lower()
+        for m in re.finditer("|".join(SCALE), line[named.end():]):
+            lead = line[named.end():][max(0, m.start() - 28):m.start()].lower()
             if re.search(r"(?:plan\w*|not|from|than|instead of|was|were|said|your|had|above|below|short of|toward|n't)"
-                         r"(?:\s+(?:the|a|an|your|my|planned|rating of))*[\s*_`\"'(]*$", lead):
+                         r"(?:\s+(?:the|a|an|your|my|planned|rating of))*[\s*_`\"'(:]*$", lead):
                 continue
             found.append(m.group())
+            break
     return found
 
 
@@ -212,7 +216,7 @@ def final(r):
     clock = r.meta["clock"]
     stamp = {k: bool(re.search(p, added)) for k, p in clock.items()}
     yield ("The appended result carries the date, the time and the timezone the clock gave, not invented ones", all(stamp.values()), str(stamp))
-    scores = re.findall(r"\d+\s*(?:/|of|out of)\s*\d+", added)
+    scores = re.findall(r"\d+\s*(?:/|of|out of)\s*\d+|\d+\s+(?:right|correct|unaided)", added)
     yield ("It gives a score for each topic", len(scores) >= 2 and all(re.search(rf"\b{t}\b", added) for t in r.meta["topics"]), f"scores found: {scores[:6]}")
     for topic, allowed, why in r.meta["expected"]:
         got = ratings(added, topic)

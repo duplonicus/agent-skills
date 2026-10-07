@@ -116,6 +116,25 @@ def test_a_first_hint_that_spells_out_a_flag_or_the_command_fails():
     assert failed(grade(entry, "Check the logs."))[0] == "The reply names the tool for the job (journalctl)"
 
 
+def test_a_second_hint_need_not_repeat_the_tool_but_must_describe_the_flags():
+    entry = by_name("second-hint-describes-the-flags")
+    assert not failed(grade(entry, "One flag picks the unit, one keeps following new lines."))
+    assert failed(grade(entry, "Think about it some more.")) == ["A second hint describes what the flags do"]
+
+
+def test_resuming_is_judged_by_the_task_it_sets():
+    entry = by_name("resume-from-the-checklist")
+    rest = "\nGoal: get the process ID. `mailsort` is read-only: never stop or restart it. You saw its status in task 1."
+    assert not failed(grade(entry, "**Linux 4/5 — find the process**" + rest))
+    assert not failed(grade(entry, "Picking up.\n\n**Task 4: find the mailsort process ID**" + rest))
+    assert not failed(grade(entry, "You've ticked 1–3, so we're on **Linux #4: find the mailsort process ID**." + rest))
+    assert not failed(grade(entry, "**Where we left off:** Linux 1–3 are ticked.\n\n**Linux 4/5 — find the process**" + rest))
+    restarted = failed(grade(entry, "**Linux 1/5 — is mailsort running?**" + rest))
+    assert restarted == ["The reply picks up at the first unticked task (finding the mailsort process ID), not at the start"]
+    two = failed(grade(entry, "**Linux 4/5 — find the process**" + rest + "\n\n**Linux 5/5 — permissions**\nGoal: a file in ~/drill."))
+    assert two == restarted
+
+
 def test_show_me_needs_the_whole_command_and_its_parts():
     entry = by_name("show-me-gives-the-command")
     good = "`journalctl --user -u mailsort -f`\n`-u` picks the unit, `-f` follows new lines. Type it yourself."
@@ -171,6 +190,10 @@ def test_quiz_grading_wants_a_verdict_the_missing_piece_and_one_question():
     ("| Linux | Average | up from the planned Fair |", "Linux", ["Average"]),
     ("Linux: Good", "Linux", ["Good"]),
     ("Git: Good", "Linux", []),
+    ("For the form: Linux Average, Git Fair.", "Linux", ["Average"]),
+    ("For the form: Linux Average, Git Fair.", "Git", ["Fair"]),
+    ("- Linux: Average (planned: Fair, so the session raises it). Not Good yet: nothing was on a server.", "Linux", ["Average"]),
+    ("- Git: Fair (planned: Good; the session lowers it). Close to Average on the strength of the conflict.", "Git", ["Fair"]),
 ])
 def test_the_rating_is_read_from_the_line_that_gives_it(line, topic, expected):
     assert check.ratings(line, topic) == expected
@@ -190,3 +213,22 @@ def test_an_inflated_or_undersold_rating_fails_and_so_does_an_invented_time():
     assert guessed == ["The appended result carries the date, the time and the timezone the clock gave, not invented ones"]
     rewritten = failed(grade(entry, reply, after=before.replace("Planning to put", "Put") + block.format(linux="Average", git="Fair")))
     assert rewritten[0] == "The result is appended to the study guide and nothing above it is changed"
+
+
+def test_stored_results_cover_every_scenario_with_the_current_checks():
+    stored = json.loads(sorted((EVALS / "results").glob("*-benchmark.json"))[-1].read_text())
+    ids = {e["id"]: e for e in SCENARIOS}
+    assert stored["metadata"]["evals_run"] == sorted(ids)
+    seen, totals = {}, {"with_skill": [0, 0], "without_skill": [0, 0]}
+    for run in stored["runs"]:
+        entry = ids[run["eval_id"]]
+        assert run["eval_name"] == entry["name"]
+        assert [x["text"] for x in run["expectations"]] == entry["expectations"], entry["name"]
+        key = (run["eval_id"], run["configuration"])
+        seen[key] = seen.get(key, 0) + 1
+        totals[run["configuration"]][0] += sum(x["passed"] for x in run["expectations"])
+        totals[run["configuration"]][1] += len(run["expectations"])
+    per = stored["metadata"]["runs_per_configuration"]
+    assert seen == {(i, c): per for i in ids for c in ("with_skill", "without_skill")}
+    for config, (passed, total) in totals.items():
+        assert (stored["run_summary"][config]["passed"], stored["run_summary"][config]["total"]) == (passed, total)

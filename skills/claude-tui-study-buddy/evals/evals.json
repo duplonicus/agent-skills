@@ -33,8 +33,7 @@
         "kind": "resume",
         "task": 4,
         "about": "finding the mailsort process ID",
-        "mention": "process|\\bPID\\b",
-        "earlier": "\\b1\\s*/\\s*[59]\\b|\\btask 1\\b"
+        "mention": "process|\\bPID\\b"
       },
       "expectations": [
         "The reply picks up at the first unticked task (finding the mailsort process ID), not at the start",
@@ -91,7 +90,6 @@
         "describes": "follow|live|new lines|stream|\\bunit\\b|which service"
       },
       "expectations": [
-        "The reply names the tool for the job (journalctl)",
         "A second hint describes what the flags do",
         "The reply does not hand over the full command",
         "The assistant did not run the task's command itself",
