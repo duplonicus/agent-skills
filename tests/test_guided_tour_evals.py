@@ -154,3 +154,18 @@ def test_a_second_stop_in_the_same_turn_fails_the_check(tmp_path):
     graded = {e["text"]: e["passed"] for e in check.grade(entry["check"], browser.state, reply)}
     assert graded[next(t for t in graded if t.startswith("The turn covers one stop"))] is False
     assert graded["The tour does not run ahead: no page past this stop is opened"] is False
+
+
+def test_stored_results_cover_every_scenario_under_its_own_id():
+    stored = json.loads(sorted((EVALS / "results").glob("*-benchmark.json"))[-1].read_text())
+    ids = {e["id"]: e for e in SCENARIOS}
+    assert stored["metadata"]["evals_run"] == sorted(ids)
+    seen = {}
+    for run in stored["runs"]:
+        entry = ids[run["eval_id"]]
+        assert run["eval_name"] == entry["name"]
+        assert [x["text"] for x in run["expectations"]] == entry["expectations"], entry["name"]
+        key = (run["eval_id"], run["configuration"])
+        seen[key] = seen.get(key, 0) + 1
+    per = stored["metadata"]["runs_per_configuration"]
+    assert seen == {(i, c): per for i in ids for c in ("with_skill", "without_skill")}

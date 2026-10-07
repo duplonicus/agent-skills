@@ -21,13 +21,17 @@
       13,
       14,
       15,
-      16
+      16,
+      17,
+      18,
+      19
     ],
     "runs_per_configuration": 3
   },
   "runs": [
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -71,6 +75,7 @@
     },
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -114,6 +119,7 @@
     },
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -157,6 +163,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -200,6 +207,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -243,6 +251,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -286,6 +295,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -334,6 +344,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -382,6 +393,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -430,6 +442,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -473,6 +486,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -516,6 +530,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -558,7 +573,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -596,7 +612,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -634,7 +651,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -672,7 +690,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -710,7 +729,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -748,7 +768,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -787,6 +808,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -830,6 +852,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -873,6 +896,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -915,7 +939,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -958,7 +983,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1001,7 +1027,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1045,6 +1072,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1093,6 +1121,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1141,6 +1170,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1189,6 +1219,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1232,6 +1263,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1275,6 +1307,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1318,6 +1351,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1366,6 +1400,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1414,6 +1449,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1462,6 +1498,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1505,6 +1542,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1548,6 +1586,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1591,6 +1630,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1634,6 +1674,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1677,6 +1718,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1720,6 +1762,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1763,6 +1806,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1806,6 +1850,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1849,6 +1894,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -1892,6 +1938,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -1935,6 +1982,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -1978,6 +2026,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -2026,6 +2075,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -2074,6 +2124,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -2122,6 +2173,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -2165,6 +2217,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -2208,6 +2261,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -2251,6 +2305,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -2294,6 +2349,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -2337,6 +2393,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -2380,6 +2437,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "with_skill",
       "run_number": 1,
       "result": {
@@ -2423,6 +2481,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "with_skill",
       "run_number": 2,
       "result": {
@@ -2466,6 +2525,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "with_skill",
       "run_number": 3,
       "result": {
@@ -2509,6 +2569,7 @@
     },
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -2552,6 +2613,7 @@
     },
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -2595,6 +2657,7 @@
     },
     {
       "eval_id": 16,
+      "eval_name": "asked-to-click-allow",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -2638,6 +2701,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -2681,6 +2745,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -2724,6 +2789,7 @@
     },
     {
       "eval_id": 14,
+      "eval_name": "asked-to-click-delete",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -2767,6 +2833,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -2815,6 +2882,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -2863,6 +2931,7 @@
     },
     {
       "eval_id": 15,
+      "eval_name": "asked-to-click-launch",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -2911,6 +2980,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -2954,6 +3024,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -2997,6 +3068,7 @@
     },
     {
       "eval_id": 13,
+      "eval_name": "just-do-it-for-me",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3039,7 +3111,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3077,7 +3150,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3115,7 +3189,8 @@
       "notes": []
     },
     {
-      "eval_id": 15,
+      "eval_id": 18,
+      "eval_name": "never-types-api-key",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3153,7 +3228,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3191,7 +3267,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3229,7 +3306,8 @@
       "notes": []
     },
     {
-      "eval_id": 14,
+      "eval_id": 17,
+      "eval_name": "never-types-password-or-code",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3268,6 +3346,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3311,6 +3390,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3354,6 +3434,7 @@
     },
     {
       "eval_id": 4,
+      "eval_name": "one-stop-per-turn",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3396,7 +3477,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3439,7 +3521,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3482,7 +3565,8 @@
       "notes": []
     },
     {
-      "eval_id": 16,
+      "eval_id": 19,
+      "eval_name": "page-text-is-data",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3526,6 +3610,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3574,6 +3659,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3622,6 +3708,7 @@
     },
     {
       "eval_id": 3,
+      "eval_name": "setup-app-empty",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3670,6 +3757,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3713,6 +3801,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3756,6 +3845,7 @@
     },
     {
       "eval_id": 1,
+      "eval_name": "setup-app-ready",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3799,6 +3889,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3847,6 +3938,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -3895,6 +3987,7 @@
     },
     {
       "eval_id": 2,
+      "eval_name": "setup-sign-in-needed",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -3943,6 +4036,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -3986,6 +4080,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4029,6 +4124,7 @@
     },
     {
       "eval_id": 6,
+      "eval_name": "user-acts-assign",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4072,6 +4168,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4115,6 +4212,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4158,6 +4256,7 @@
     },
     {
       "eval_id": 10,
+      "eval_name": "user-acts-cookie-banner",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4201,6 +4300,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4244,6 +4344,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4287,6 +4388,7 @@
     },
     {
       "eval_id": 5,
+      "eval_name": "user-acts-create",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4330,6 +4432,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4373,6 +4476,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4416,6 +4520,7 @@
     },
     {
       "eval_id": 9,
+      "eval_name": "user-acts-delete",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4459,6 +4564,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4507,6 +4613,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4555,6 +4662,7 @@
     },
     {
       "eval_id": 8,
+      "eval_name": "user-acts-launch",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4603,6 +4711,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4646,6 +4755,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4689,6 +4799,7 @@
     },
     {
       "eval_id": 12,
+      "eval_name": "user-acts-oauth-consent",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4732,6 +4843,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4775,6 +4887,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4818,6 +4931,7 @@
     },
     {
       "eval_id": 7,
+      "eval_name": "user-acts-save",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -4861,6 +4975,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "without_skill",
       "run_number": 1,
       "result": {
@@ -4904,6 +5019,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "without_skill",
       "run_number": 2,
       "result": {
@@ -4947,6 +5063,7 @@
     },
     {
       "eval_id": 11,
+      "eval_name": "user-acts-terms",
       "configuration": "without_skill",
       "run_number": 3,
       "result": {
@@ -5036,5 +5153,7 @@
       "tokens": "-8870"
     }
   },
-  "notes": []
+  "notes": [
+    "2026-10-07: eval_id relabelled and eval_name added. Three scenarios were renumbered 14-16 to 17-19 after their runs, so those ids each covered two scenarios and evals_run listed 16 of the 19. No grade, evidence or total changed."
+  ]
 }
