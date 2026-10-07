@@ -5,6 +5,7 @@ Skills I wrote and use, in the open [Agent Skills](https://agentskills.io) forma
 | Skill | What it does |
 |---|---|
 | [`guided-tour`](skills/guided-tour/SKILL.md) | Gets a person up to speed on a product or console they don't know yet. It drives the real interface in their browser, spotlights each control, sets a small task, then waits while they try it and ask questions. The user makes every click that changes anything. |
+| [`claude-tui-study-buddy`](skills/claude-tui-study-buddy/SKILL.md) | Practice partner for command-line skills. The user types every command in the session's own shell; the agent sets one small task at a time, hints before it answers, reads each result, then quizzes from memory and gives an honest rating. |
 | [`todo-list`](skills/todo-list/SKILL.md) | Keeps shopping and to-do lists in a live page the user can tap on and the agent can edit from chat. Every change the agent makes is undoable from the page's History. |
 | [`sum`](skills/sum/SKILL.md) | Short for summary. End-of-session handoff. One paste-ready block (what was done, current state, what is next, gotchas, files touched) that starts the next thread, so a fresh session continues without re-reading this one. |
 | [`critique`](skills/critique/SKILL.md) | Honest post-mortem of a session: the agent's own process mistakes and the work product as its reader will see it, with evidence, ending in rules for next time. |
@@ -24,6 +25,18 @@ A person learns a UI by touching it, so the tour is a loop of *point, explain, t
 - **Somewhere safe to practise.** [`references/practice-environments.md`](skills/guided-tour/references/practice-environments.md) lists where to find a safe sandbox for each kind of tool, and tells the agent to quote the vendor's current terms instead of recalling them.
 
 It needs an agent with browser tools that can read the open page and run JavaScript in it.
+
+## claude-tui-study-buddy
+
+`guided-tour` for the terminal. The same idea, a different surface: the agent stops and the user does the work.
+
+- **The user types every command.** In Claude Code a line starting with `!` runs in the session's shell, so the agent sees the output without running anything itself.
+- **Goals, not commands.** Each task says what to make happen. Hints climb a ladder: which tool, then which flag, then the full command only when asked for.
+- **Two safety lines, agreed first.** A real service or repository used as the practice subject is read-only. Anything that changes state happens in a throwaway folder.
+- **A quiz from memory, graded honestly.** One question per turn, no leading, and a confident wrong answer is wrong.
+- **A rating that rests on the record.** The agent keeps a tally of what was done unaided, hinted or shown, and recommends a self-rating from that: not inflated, not undersold. The result is appended to the study guide.
+
+It has no evals yet.
 
 ## todo-list
 
