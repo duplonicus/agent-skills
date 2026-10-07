@@ -129,7 +129,7 @@ If the user needs a self-rating (a job form, a skills matrix), recommend one per
 - **If they had a rating in mind,** say plainly whether the session supports it, raises it or lowers it.
 
 ### Write it down
-Append the result to the end of the plan file: the date and time with the timezone, the score per topic, each recommended rating with its one-line reason, and the tasks worth repeating. Append only; leave the rest of the file as it was.
+Append the result to the end of the plan file: the date and time with the timezone, the score per topic, each recommended rating with its one-line reason, and the tasks worth repeating. Append only; leave the rest of the file as it was. Take the date and time from the clock, never from a guess: if the clock cannot be read, write the date and say the time is not known.
 
 ### End plainly
 - The three things most worth repeating before the real thing.

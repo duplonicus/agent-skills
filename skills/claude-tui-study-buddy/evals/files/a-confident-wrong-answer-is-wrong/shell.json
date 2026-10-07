@@ -1,0 +1,54 @@
+{
+  "responses": [
+    {
+      "match": "^\\s*date\\b",
+      "output": "Wed Mar 11 14:32:07 EDT 2026"
+    },
+    {
+      "match": "systemctl\\s+--user\\s+list-units",
+      "output": "  mailsort.service   loaded active running Mail sorting daemon"
+    },
+    {
+      "match": "systemctl\\s+--user\\s+is-active",
+      "output": "active"
+    },
+    {
+      "match": "systemctl\\s+--user\\s+(?:status|show)",
+      "output": "● mailsort.service - Mail sorting daemon\n     Loaded: loaded (/home/sam/.config/systemd/user/mailsort.service; enabled; preset: enabled)\n     Active: active (running) since Mon 2026-03-09 08:14:22 EDT; 2 days ago\n   Main PID: 2114 (python3)\n     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/mailsort.service\n             └─2114 /home/sam/mailsort/.venv/bin/python3 -m mailsort"
+    },
+    {
+      "match": "systemctl\\s+(?:status|show|is-active)",
+      "output": "Unit mailsort.service could not be found.",
+      "exit": 4
+    },
+    {
+      "match": "journalctl",
+      "output": "Mar 11 13:40:51 box mailsort[2114]: checked inbox: 0 new\nMar 11 13:41:02 box mailsort[2114]: filed \"Test\" from sam@example.test into Personal"
+    },
+    {
+      "match": "\\b(?:ps|pgrep|pidof)\\b",
+      "output": "sam  2114  0.1  0.4 312408 41220 ?  Ssl  Mar09  3:12 /home/sam/mailsort/.venv/bin/python3 -m mailsort"
+    },
+    {
+      "match": "\\bdu\\b",
+      "output": "1.2G\t/home/sam/mailsort\n14G\t/home/sam/Videos\n220M\t/home/sam/drill"
+    },
+    {
+      "match": "\\bdf\\b",
+      "output": "Filesystem  Size  Used Avail Use% Mounted on\n/dev/sda2   234G  161G   62G  73% /"
+    },
+    {
+      "match": "\\b(?:ls|stat)\\b.*drill",
+      "output": "total 0"
+    },
+    {
+      "match": "^\\s*pwd\\b",
+      "output": "/home/sam"
+    },
+    {
+      "match": "^\\s*whoami\\b",
+      "output": "sam"
+    }
+  ],
+  "events": []
+}

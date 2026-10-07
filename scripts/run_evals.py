@@ -23,6 +23,8 @@ A fixture lives under skills/<skill>/evals/files/<name>/ and is made of:
                   (mock Artifact and ArtifactData tools, plus python3)
   browser.json    optional: a fake web app for scripts/mock_browser.py
                   (mock browser tools; every click and keystroke is recorded)
+  shell.json      optional: scripted answers for scripts/mock_shell.py
+                  (a mock shell; every command the agent runs is recorded)
 
 Runs are resumable: a run that finished is skipped when the same command is
 repeated, so an interrupted batch picks up where it stopped. --force redoes them.
@@ -92,6 +94,12 @@ MOCKS = {
                    "mcp__browser__get_page_text,mcp__browser__read_page,mcp__browser__find,"
                    "mcp__browser__javascript_tool,mcp__browser__computer,mcp__browser__form_input",
         "note": "\nYou control the user's browser through the `mcp__browser__*` tools, which are already loaded: there is no separate browser skill to read and no ToolSearch step. Web search and web fetch are not available in this session.\n",
+    },
+    "shell.json": {
+        "server": "mock_shell.py", "name": "shell",
+        "tools": "Read,Write,Edit,Glob,Grep",
+        "allowed": "mcp__shell__run",
+        "note": "\nThis is a terminal session on the user's machine. The user can run a shell command themselves by starting a line with `!`; the command and its output then appear in the conversation. You can run a shell command there with `mcp__shell__run`, which is the only way for you to run one. The files under `./project` are the user's own; use your file tools on them.\n",
     },
 }
 
