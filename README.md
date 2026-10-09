@@ -2,6 +2,8 @@
 
 Skills I wrote and use, in the open [Agent Skills](https://agentskills.io) format: a folder with a `SKILL.md` that any compatible agent can load.
 
+How the repo and its eval harness fit together: [ARCHITECTURE.md](ARCHITECTURE.md).
+
 | Skill | What it does |
 |---|---|
 | [`guided-tour`](skills/guided-tour/SKILL.md) | Gets a person up to speed on a product or console they don't know yet. It drives the real interface in their browser, spotlights each control, sets a small task, then waits while they try it and ask questions. The user makes every click that changes anything. |
