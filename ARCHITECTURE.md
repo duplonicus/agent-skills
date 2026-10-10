@@ -280,7 +280,7 @@ The page subscribes to all three and redraws when any of them changes. It is pub
 
 ## Tests and validation
 
-`uv run --with pytest --with playwright pytest tests` runs 198 tests (2026-10-10); 30 of them drive the `todo-list` page in a headless browser and are skipped without Playwright. No test calls an agent.
+`uv run --with pytest --with playwright pytest tests` runs 203 tests (2026-10-10); 35 of them drive the `todo-list` page in a headless browser and are skipped without Playwright. No test calls an agent.
 
 | File | What it pins down |
 |---|---|

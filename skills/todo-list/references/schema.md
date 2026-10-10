@@ -17,8 +17,9 @@ The doc id is the slug (`shopping`, `hardware-store`). `__history` is reserved f
 | text | string | What the person sees. |
 | done | bool | Checked off. |
 | created | ISO time | |
-| doneAt | ISO time or null | Set when checked, null when unchecked. The Done section sorts by it. |
+| doneAt | ISO time or null | Set when checked, null when unchecked. The Done section sorts by it, newest first. |
 | order | number | Sort key for open items, lower = higher up. New items use epoch ms. Missing → falls back to `created`. |
+| doneOrder | number or null, optional | Set when a done item is dragged within the Done section; it then sorts by this instead of `doneAt` (same scale: minus the check-off time in ms, lower = higher up). The page clears it whenever the item is checked or unchecked. |
 | due | string or null, optional | `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, the person's own wall-clock time with no zone. The page shows it under the item and marks it overdue; it never reorders items. Anything else is ignored. |
 | calEvent | string or null, optional | Id of the calendar event that reminds the person of this item. Only the assistant writes it. |
 | calDue | string or null, optional | The `due` value that event was made for. The page shows the reminder bell only while it equals `due`, so a date changed on the page shows no bell until `scripts/reminders.py` has been acted on. |

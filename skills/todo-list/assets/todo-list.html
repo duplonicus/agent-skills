@@ -120,10 +120,12 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
   const HISTORY_CAP = 300;
   let db = null, lists = [], items = [], history = [], current = null, editing = null, armedDelete = false, canWrite = true;
   let renaming = false, histFilter = "all", armedClearHist = false;
-  let dragging = false, pending = false, openOrder = [], justDragged = false, toastTimer = null;
+  let dragging = false, pending = false, justDragged = false, toastTimer = null;
   let itemDrag = false, ptX = 0, ptY = 0, dropTab = null;
   const key = i => typeof i.order === "number" ? i.order : (Date.parse(i.created || "") || 0);
   const lkey = l => typeof l.order === "number" ? l.order : 0;
+  // Done items: newest check-off first, unless they've been dragged, which gives them a doneOrder on the same scale.
+  const dkey = i => typeof i.doneOrder === "number" ? i.doneOrder : -(Date.parse(i.doneAt || "") || 0);
   const strip = o => { const { id, ...rest } = o; return rest; };
   const listName = id => lists.find(l => l.id === id)?.name || "";
 
@@ -152,16 +154,16 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
   const reminded = it => !!(it.due && it.calEvent && it.calDue === it.due);
   window.__dueInfo = dueInfo;
 
-  async function reorder(arr, from, to, coll, k) {
+  async function reorder(arr, from, to, coll, k, field = "order") {
     if (from === to) return;
     const moved = arr[from]; const rest = arr.filter((_, i) => i !== from); rest.splice(to, 0, moved);
     const prev = rest[to - 1], next = rest[to + 1];
     let v = prev && next ? (k(prev) + k(next)) / 2 : prev ? k(prev) + 1000 : next ? k(next) - 1000 : 0;
     try {
       if ((prev && v === k(prev)) || (next && v === k(next))) {
-        for (let i = 0; i < rest.length; i++) await db.doc(coll + "/" + rest[i].id).update({ order: (i + 1) * 1000 });
+        for (let i = 0; i < rest.length; i++) await db.doc(coll + "/" + rest[i].id).update({ [field]: (i + 1) * 1000 });
       } else {
-        await db.doc(coll + "/" + moved.id).update({ order: v });
+        await db.doc(coll + "/" + moved.id).update({ [field]: v });
       }
     } catch (e) { fail(e); render(); }
   }
@@ -321,7 +323,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
   function itemRow(it) {
     const li = document.createElement("li");
     if (it.done) li.className = "done";
-    if (!it.done && canWrite) {
+    if (canWrite) {
       const g = document.createElement("span"); g.className = "grip"; g.textContent = "⠿";
       g.setAttribute("aria-hidden", "true"); g.title = "Drag to reorder, or onto another list's tab to move it";
       li.append(g);
@@ -330,7 +332,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     c.className = "check"; c.type = "button"; c.innerHTML = CHECK;
     c.setAttribute("aria-label", (it.done ? "Uncheck " : "Check off ") + it.text);
     c.onclick = () => {
-      db.doc("items/" + it.id).update({ done: !it.done, doneAt: it.done ? null : new Date().toISOString() })
+      db.doc("items/" + it.id).update({ done: !it.done, doneAt: it.done ? null : new Date().toISOString(), doneOrder: null })
         .then(() => log(it.done ? "uncheck" : "check", (it.done ? "Unchecked “" : "Checked off “") + it.text + "”", it.list))
         .catch(fail);
     };
@@ -510,26 +512,27 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     renderSuggestions();
     const mine = items.filter(i => i.list === current);
     const open = mine.filter(i => !i.done).sort((a, b) => key(a) - key(b));
-    openOrder = open;
-    const done = mine.filter(i => i.done).sort((a, b) => (b.doneAt || "").localeCompare(a.doneAt || ""));
+    const done = mine.filter(i => i.done).sort((a, b) => dkey(a) - dkey(b));
+    // Both sections drag the same way: within the section to reorder, or onto another list's tab to move.
+    const draggable = (ul, arr, k, field) => {
+      if (!canWrite || !window.Sortable) return;
+      Sortable.create(ul, { ...sortOpts, handle: ".grip",
+        onStart: () => { dragging = true; itemDrag = true; document.body.classList.add("item-drag"); },
+        onEnd: e => {
+          const t = dropTab || tabAt(ptX, ptY);
+          itemDrag = false; document.body.classList.remove("item-drag"); dropTab?.classList.remove("drop"); dropTab = null;
+          endDrag();
+          if (t && t.dataset.id && t.dataset.id !== current && lists.some(l => l.id === t.dataset.id)) { moveItem(arr[e.oldIndex], t.dataset.id); render(); return; }
+          reorder(arr, e.oldIndex, e.newIndex, "items", k, field).then(() => { if (!dragging) render(); }); render();
+        } });
+    };
     if (!open.length) {
       const e = document.createElement("div"); e.className = "empty";
       e.innerHTML = done.length ? "<b>All done.</b> Nothing left on this list." : "<b>Nothing here yet.</b><br>Type above and hit Add.";
       main.append(e);
     } else {
       const ul = document.createElement("ul"); open.forEach(i => ul.append(itemRow(i))); main.append(ul);
-      if (canWrite && window.Sortable) {
-        Sortable.create(ul, { ...sortOpts, handle: ".grip",
-          onStart: () => { dragging = true; itemDrag = true; document.body.classList.add("item-drag"); },
-          onEnd: e => {
-            const arr = openOrder;
-            const t = dropTab || tabAt(ptX, ptY);
-            itemDrag = false; document.body.classList.remove("item-drag"); dropTab?.classList.remove("drop"); dropTab = null;
-            endDrag();
-            if (t && t.dataset.id && t.dataset.id !== current && lists.some(l => l.id === t.dataset.id)) { moveItem(arr[e.oldIndex], t.dataset.id); render(); return; }
-            reorder(arr, e.oldIndex, e.newIndex, "items", key).then(() => { if (!dragging) render(); }); render();
-          } });
-      }
+      draggable(ul, open, key, "order");
     }
     if (done.length) {
       const h = document.createElement("div"); h.className = "sub";
@@ -541,6 +544,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
       }
       main.append(h);
       const ul = document.createElement("ul"); done.forEach(i => ul.append(itemRow(i))); main.append(ul);
+      draggable(ul, done, dkey, "doneOrder");
     }
     if (canWrite) {
       const bar = document.createElement("div"); bar.className = "listbar";

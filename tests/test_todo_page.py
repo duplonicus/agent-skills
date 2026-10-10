@@ -66,11 +66,12 @@ def browser():
         b.close()
 
 
-def open_page(browser, scheme="light", seed=SEED):
+def open_page(browser, scheme="light", seed=SEED, sortable=False):
     ctx = browser.new_context(locale="en-US", timezone_id="America/Toronto", color_scheme=scheme,
                               viewport={"width": 400, "height": 900})
     page = ctx.new_page()
-    page.route("https://cdn.jsdelivr.net/**", lambda r: r.abort())   # drag-and-drop is not under test
+    if not sortable:   # only the drag tests need the drag library, and with it the network
+        page.route("https://cdn.jsdelivr.net/**", lambda r: r.abort())
     page.clock.install(time=NOW)
     page.add_init_script(FAKE_DB % json.dumps(seed))
     errors = []
@@ -225,3 +226,83 @@ def test_nothing_overflows_at_phone_width(browser):
     page.click("li:has-text('Call dentist') .text")
     page.wait_for_selector("#due-date-timed")
     assert page.evaluate("() => document.documentElement.scrollWidth <= window.innerWidth")
+
+
+# ---------- handles on done items ----------
+
+DONE_SEED = {
+    "lists": {"todo": {"name": "Todo", "order": 1000}, "shop": {"name": "Shop", "order": 2000}},
+    "items": dict([
+        base("open1", "Still open", 1),
+        base("d1", "Done first", 2, done=True, doneAt="2026-10-07T12:00:00.000Z"),
+        base("d2", "Done second", 3, done=True, doneAt="2026-10-08T12:00:00.000Z"),
+        base("d3", "Done third", 4, done=True, doneAt="2026-10-09T12:00:00.000Z"),
+    ]),
+    "history": {},
+}
+DONE_TEXTS = "() => [...document.querySelectorAll('#main li.done .label')].map(e => e.textContent)"
+
+
+def drag(page, text, target):
+    grip = page.locator(f"li:has-text('{text}') .grip").bounding_box()
+    to = page.locator(target).bounding_box()
+    x, y = grip["x"] + grip["width"] / 2, grip["y"] + grip["height"] / 2
+    tx, ty = to["x"] + to["width"] / 2, to["y"] + to["height"] * 0.8
+    page.mouse.move(x, y)
+    page.mouse.down()
+    for i in range(1, 11):
+        page.mouse.move(x + (tx - x) * i / 10, y + (ty - y) * i / 10)
+    page.mouse.up()
+
+
+def drag_page(browser):
+    page = open_page(browser, seed=DONE_SEED, sortable=True)
+    if not page.evaluate("() => !!window.Sortable"):
+        pytest.skip("the drag library did not load from its CDN (no network)")
+    return page
+
+
+def test_done_items_have_a_handle_and_sort_newest_first(browser):
+    page = open_page(browser, seed=DONE_SEED)
+    assert page.evaluate(DONE_TEXTS) == ["Done third", "Done second", "Done first"]
+    assert page.evaluate("() => [...document.querySelectorAll('#main li')].map(li => !!li.querySelector('.grip'))") == [True] * 4
+
+
+def test_a_dragged_done_item_keeps_its_place(browser):
+    seed = json.loads(json.dumps(DONE_SEED))
+    # As the page stores a drag of "Done first" to between the other two: halfway between their keys.
+    seed["items"]["d1"]["doneOrder"] = -(1791547200000 + 1791460800000) / 2
+    page = open_page(browser, seed=seed)
+    assert page.evaluate(DONE_TEXTS) == ["Done third", "Done first", "Done second"]
+
+
+def test_checking_or_unchecking_forgets_a_dragged_position(browser):
+    seed = json.loads(json.dumps(DONE_SEED))
+    seed["items"]["d1"]["doneOrder"] = -1e15   # dragged to the very top
+    page = open_page(browser, seed=seed)
+    assert page.evaluate(DONE_TEXTS)[0] == "Done first"
+    page.click("li:has-text('Done first') .check")
+    page.wait_for_function("() => window.__cols.items.get('d1').done === false")
+    assert page.evaluate("() => window.__cols.items.get('d1').doneOrder") is None
+    page.click("li:has-text('Still open') .check")
+    page.wait_for_function("() => window.__cols.items.get('open1').done === true")
+    assert page.evaluate(DONE_TEXTS) == ["Still open", "Done third", "Done second"]
+
+
+def test_dragging_a_done_item_reorders_the_done_section(browser):
+    page = drag_page(browser)
+    drag(page, "Done third", "li:has-text('Done first')")
+    page.wait_for_function("() => typeof window.__cols.items.get('d3').doneOrder === 'number'")
+    assert page.evaluate(DONE_TEXTS) == ["Done second", "Done first", "Done third"]
+    items = page.evaluate("() => Object.fromEntries(window.__cols.items)")
+    assert all("doneOrder" not in items[k] for k in ("d1", "d2", "open1")), "only the dragged item is written"
+    assert items["d3"]["done"] is True and items["d3"]["order"] == 4
+    assert page.errors == []
+
+
+def test_dragging_a_done_item_onto_a_tab_moves_it_to_that_list(browser):
+    page = drag_page(browser)
+    drag(page, "Done second", ".tab[data-id='shop']")
+    page.wait_for_function("() => window.__cols.items.get('d2').list === 'shop'")
+    assert page.evaluate("() => window.__cols.items.get('d2').done") is True
+    assert page.evaluate(DONE_TEXTS) == ["Done third", "Done first"]
