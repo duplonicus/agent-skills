@@ -19,7 +19,7 @@ SKELETON = ('<!doctype html><html><head><meta charset=utf8><meta name=viewport c
 NOW = "2026-10-10T14:00:00"   # a Saturday, local time
 
 FAKE_DB = """
-(seed => {
+((seed, opts) => {
   const cols = { lists: new Map(), items: new Map(), history: new Map() }, subs = { lists: [], items: [], history: [] };
   for (const [c, docs] of Object.entries(seed)) for (const [id, d] of Object.entries(docs)) cols[c].set(id, d);
   let n = 0;
@@ -33,8 +33,18 @@ FAKE_DB = """
       add: async d => { const r = ref(c, "p" + (++n)); await r.set(d); return r; }, doc: id => ref(c, id || "p" + (++n)) }),
     doc: path => { const [c, id] = path.split("/"); return ref(c, id); } };
   window.__cols = cols;
-  window.claude = { use: async name => name === "db" ? db : { can: async () => true } };
-})(%s);
+  // A stand-in calendar connector: records every call, hands out event ids, fails on request.
+  const cal = { calls: [], fail: opts.calFail || null, n: 0 };
+  window.__cal = cal;
+  const mcp = { callTool: async (server, tool, input) => {
+    cal.calls.push({ server, tool, input });
+    const f = cal.fail && (cal.fail[tool] || cal.fail["*"]);
+    if (f) throw { code: f, message: f };
+    return { payload: tool === "create_event" ? { id: "ev-new-" + (++cal.n) } : {} };
+  } };
+  window.claude = { use: async name => name === "db" ? db : name === "mcp" ? (opts.calendar ? mcp : null)
+    : { can: async () => opts.readOnly ? false : true } };
+})(%s, %s);
 """
 
 
@@ -66,14 +76,14 @@ def browser():
         b.close()
 
 
-def open_page(browser, scheme="light", seed=SEED, sortable=False):
+def open_page(browser, scheme="light", seed=SEED, sortable=False, **opts):
     ctx = browser.new_context(locale="en-US", timezone_id="America/Toronto", color_scheme=scheme,
                               viewport={"width": 400, "height": 900})
     page = ctx.new_page()
     if not sortable:   # only the drag tests need the drag library, and with it the network
         page.route("https://cdn.jsdelivr.net/**", lambda r: r.abort())
     page.clock.install(time=NOW)
-    page.add_init_script(FAKE_DB % json.dumps(seed))
+    page.add_init_script(FAKE_DB % (json.dumps(seed), json.dumps(opts)))
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.route("http://todo.test/", lambda r: r.fulfill(content_type="text/html", body=SKELETON % PAGE.read_text()))
@@ -306,3 +316,230 @@ def test_dragging_a_done_item_onto_a_tab_moves_it_to_that_list(browser):
     page.wait_for_function("() => window.__cols.items.get('d2').list === 'shop'")
     assert page.evaluate("() => window.__cols.items.get('d2').done") is True
     assert page.evaluate(DONE_TEXTS) == ["Done third", "Done first"]
+
+
+# ---------- reminders the page makes itself ----------
+
+REMINDERS = [{"method": "popup", "minutes": 1440}, {"method": "popup", "minutes": 60}]
+CALLS = "() => window.__cal.calls"
+ITEM = "id => window.__cols.items.get(id) || null"
+
+
+def settle(page, n=None):
+    """Wait until the page has stopped talking to the calendar."""
+    if n is not None:
+        page.wait_for_function("n => window.__cal.calls.length >= n", arg=n)
+    page.wait_for_timeout(500)
+
+
+def set_due(page, item_id, text, date, time=None):
+    page.click(f"li:has-text('{text}') .text")
+    page.fill(f"#due-date-{item_id}", date)
+    if time:
+        page.fill(f"#due-time-{item_id}", time)
+    page.press(f"#due-date-{item_id}", "Enter")
+
+
+@pytest.mark.parametrize("item, expected", [
+    ({"due": "2026-10-16T15:00"}, ("create", "2026-10-16T15:00:00", "2026-10-16T15:30:00")),
+    ({"due": "2026-10-16"}, ("create", "2026-10-16T09:00:00", "2026-10-16T09:30:00")),       # date only: 9 in the morning
+    ({"due": "2026-10-10T14:01"}, ("create", "2026-10-10T14:01:00", "2026-10-10T14:31:00")),  # a minute ahead still counts
+    ({"due": "2026-10-16T15:00", "calEvent": "e", "calDue": "2026-10-12"}, ("update", "2026-10-16T15:00:00", "2026-10-16T15:30:00")),
+    ({"due": "2026-10-16T15:00", "calEvent": "e", "calDue": None}, ("update", "2026-10-16T15:00:00", "2026-10-16T15:30:00")),
+    ({"due": "2026-10-16T15:00", "calEvent": "e", "calDue": "2026-10-16T15:00"}, None),      # already in step
+    ({"due": "2026-10-16T15:00", "calEvent": "e", "calDue": "2026-10-16T15:00", "done": True}, ("delete",)),
+    ({"calEvent": "e", "calDue": "2026-10-16"}, ("delete",)),                                # due date removed
+    ({"due": "nonsense", "calEvent": "e"}, ("delete",)),
+    ({}, None),
+    ({"due": "2026-10-16", "done": True}, None),
+    ({"due": "2026-10-10T14:00"}, None),                                                     # already past
+    ({"due": "2026-10-10"}, None),                                                           # 9:00 today has passed
+    ({"due": "2026-02-30"}, None),
+])
+def test_what_the_calendar_needs_for_one_item(browser, item, expected):
+    page = open_page(browser)
+    op = page.evaluate("it => window.__reminderOp({id: 'x1', text: 'Call dentist', done: false, ...it}, new Date())", item)
+    if expected is None:
+        assert op is None
+        return
+    assert op["op"] == expected[0]
+    if expected[0] == "delete":
+        assert op == {"op": "delete", "eventId": "e"}
+        return
+    assert op["event"] == {"summary": "Due: Call dentist", "startTime": expected[1], "endTime": expected[2],
+                           "description": "From your to-do list. Change the due date on the list, not here.\nto-do-list-item:x1",
+                           "overrideReminders": REMINDERS}
+    assert op.get("eventId") == ("e" if expected[0] == "update" else None)
+
+
+def test_the_page_and_the_skill_script_plan_the_same_event(browser):
+    """reminders.py and the page must agree, or each would keep undoing the other."""
+    import subprocess, sys
+    script = PAGE.parent.parent / "scripts" / "reminders.py"
+    page = open_page(browser)
+    for doc_id, data in SEED["items"].items():
+        out = subprocess.run([sys.executable, str(script), "plan", "--now", NOW[:16], "--item",
+                              json.dumps({"id": doc_id, "version": 1, "data": data})], capture_output=True, text=True)
+        theirs = json.loads(out.stdout)
+        ours = page.evaluate("it => window.__reminderOp(it, new Date())", {"id": doc_id, **data})
+        if not theirs:
+            assert ours is None, doc_id
+            continue
+        (theirs,) = theirs
+        assert ours["op"] == theirs["op"] and ours.get("eventId") == theirs.get("eventId"), doc_id
+        assert ours.get("event") == theirs.get("event"), doc_id
+
+
+def test_setting_a_due_date_makes_the_calendar_event_and_shows_the_bell(browser):
+    page = open_page(browser, calendar=True)
+    set_due(page, "plain", "Buy stamps", "2026-10-16", "15:00")
+    settle(page, 1)
+    assert page.evaluate(CALLS) == [{"server": "Google Calendar", "tool": "create_event", "input": {
+        "summary": "Due: Buy stamps", "startTime": "2026-10-16T15:00:00", "endTime": "2026-10-16T15:30:00",
+        "description": "From your to-do list. Change the due date on the list, not here.\nto-do-list-item:plain",
+        "overrideReminders": REMINDERS}}]
+    item = page.evaluate(ITEM, "plain")
+    assert (item["due"], item["calEvent"], item["calDue"]) == ("2026-10-16T15:00", "ev-new-1", "2026-10-16T15:00")
+    assert [r["bell"] for r in rows(page) if r["text"] == "Buy stamps"] == [True]
+
+
+def test_changing_the_date_moves_the_same_event(browser):
+    page = open_page(browser, calendar=True)
+    set_due(page, "timed", "Call dentist", "2026-10-19")
+    settle(page, 1)
+    (call,) = page.evaluate(CALLS)
+    assert call["tool"] == "update_event" and call["input"]["eventId"] == "ev1"
+    assert call["input"]["startTime"] == "2026-10-19T15:00:00"
+    item = page.evaluate(ITEM, "timed")
+    assert (item["calEvent"], item["calDue"]) == ("ev1", "2026-10-19T15:00")
+
+
+def test_an_event_deleted_by_hand_in_the_calendar_is_made_again(browser):
+    page = open_page(browser, calendar=True, calFail={"update_event": "tool_error"})
+    set_due(page, "timed", "Call dentist", "2026-10-19")
+    settle(page, 2)
+    assert [c["tool"] for c in page.evaluate(CALLS)] == ["update_event", "create_event"]
+    assert page.evaluate(ITEM, "timed")["calEvent"] == "ev-new-1"
+
+
+def test_removing_the_due_date_removes_the_event(browser):
+    page = open_page(browser, calendar=True)
+    page.click("li:has-text('Call dentist') .text")
+    page.click("text=No due date")
+    settle(page, 1)
+    assert page.evaluate(CALLS) == [{"server": "Google Calendar", "tool": "delete_event", "input": {"eventId": "ev1"}}]
+    item = page.evaluate(ITEM, "timed")
+    assert (item["due"], item["calEvent"], item["calDue"]) == (None, None, None)
+
+
+def test_checking_off_removes_the_event_and_unchecking_makes_a_new_one(browser):
+    page = open_page(browser, calendar=True)
+    page.click("li:has-text('Call dentist') .check")
+    settle(page, 1)
+    assert [c["tool"] for c in page.evaluate(CALLS)] == ["delete_event"]
+    item = page.evaluate(ITEM, "timed")
+    assert item["done"] is True and item["calEvent"] is None and item["due"] == "2026-10-16T15:00"
+    page.click("li:has-text('Call dentist') .check")
+    settle(page, 2)
+    assert [c["tool"] for c in page.evaluate(CALLS)] == ["delete_event", "create_event"]
+    assert page.evaluate(ITEM, "timed")["calEvent"] == "ev-new-1"
+
+
+def test_renaming_an_item_retitles_its_event(browser):
+    page = open_page(browser, calendar=True)
+    page.click("li:has-text('Call dentist') .text")
+    page.fill("#edit-timed", "Call the dentist")
+    page.press("#edit-timed", "Enter")
+    settle(page, 1)
+    (call,) = page.evaluate(CALLS)
+    assert call["tool"] == "update_event" and call["input"]["summary"] == "Due: Call the dentist"
+    assert page.evaluate(ITEM, "timed")["calDue"] == "2026-10-16T15:00"
+
+
+def test_deleting_an_item_removes_its_event_and_restore_makes_a_new_one(browser):
+    page = open_page(browser, calendar=True)
+    page.click("li:has-text('Call dentist') .del")
+    settle(page, 1)
+    assert page.evaluate(CALLS) == [{"server": "Google Calendar", "tool": "delete_event", "input": {"eventId": "ev1"}}]
+    (snap,) = page.evaluate("() => [...window.__cols.history.values()][0].snapshot.items")
+    assert snap["due"] == "2026-10-16T15:00" and "calEvent" not in snap and "calDue" not in snap
+    page.click(".tab.hist")
+    page.click("text=Restore")
+    settle(page, 2)
+    assert [c["tool"] for c in page.evaluate(CALLS)] == ["delete_event", "create_event"]
+    assert page.evaluate(ITEM, "timed")["calEvent"] == "ev-new-1"
+
+
+def test_undo_before_the_event_is_gone_still_ends_with_one_live_reminder(browser):
+    page = open_page(browser, calendar=True)
+    page.click("li:has-text('Call dentist') .del")
+    page.click("#toastUndo")          # straight away, while the calendar call is still on its way
+    settle(page, 2)
+    assert [c["tool"] for c in page.evaluate(CALLS)] == ["delete_event", "create_event"]
+    item = page.evaluate(ITEM, "timed")
+    assert (item["calEvent"], item["calDue"]) == ("ev-new-1", "2026-10-16T15:00")
+
+
+def test_a_past_due_date_asks_the_calendar_for_nothing(browser):
+    page = open_page(browser, calendar=True)
+    set_due(page, "plain", "Buy stamps", "2026-10-09")
+    settle(page)
+    assert page.evaluate(CALLS) == []
+    assert "calEvent" not in page.evaluate(ITEM, "plain")
+
+
+def test_the_page_never_calls_the_calendar_on_load(browser):
+    page = open_page(browser, calendar=True)
+    settle(page)
+    assert page.evaluate(CALLS) == []
+    # Seeded: "Book flights" was moved after its reminder was made, "Pay rent" is due tonight with no
+    # reminder, and "File taxes" is done but still linked.
+    assert page.inner_text("#calbar span") == "3 items' calendar reminders are out of date."
+
+
+def test_update_reminders_catches_the_calendar_up(browser):
+    page = open_page(browser, calendar=True)
+    page.click("#calSync")
+    settle(page, 3)
+    calls = page.evaluate(CALLS)
+    assert sorted((c["tool"], c["input"].get("eventId")) for c in calls) == [
+        ("create_event", None), ("delete_event", "ev3"), ("update_event", "ev2")]
+    assert page.evaluate(ITEM, "soon")["calEvent"] == "ev-new-1"
+    assert page.evaluate(ITEM, "moved")["calDue"] == "2026-10-11"
+    assert page.evaluate(ITEM, "fin")["calEvent"] is None
+    assert page.locator("#calbar").count() == 0
+
+
+@pytest.mark.parametrize("code, says, final", [
+    ("server_not_connected", "add Google Calendar in claude.ai Settings", True),
+    ("needs_reauth", "Reconnect Google Calendar", True),
+    ("not_in_manifest", "Calendar reminders are off for this page", True),
+    ("blocked_by_policy", "organization", True),
+    ("server_unavailable", "Couldn't reach Google Calendar", False),
+])
+def test_calendar_trouble_keeps_the_due_date_and_says_what_to_do(browser, code, says, final):
+    page = open_page(browser, calendar=True, calFail={"*": code})
+    set_due(page, "plain", "Buy stamps", "2026-10-16", "15:00")
+    settle(page, 1)
+    item = page.evaluate(ITEM, "plain")
+    assert item["due"] == "2026-10-16T15:00" and "calEvent" not in item, "the list change stands, with no false reminder"
+    assert says in page.inner_text("#calbar span")
+    assert [r["bell"] for r in rows(page) if r["text"] == "Buy stamps"] == [False]
+    # A fix the viewer has to make elsewhere is not something to retry from here; a blip is.
+    assert page.locator("#calSync").count() == (0 if final else 1)
+    assert len(page.evaluate(CALLS)) == 1, "one failed call, never a retry loop"
+
+
+def test_without_a_calendar_connector_the_page_works_as_before(browser):
+    page = open_page(browser)
+    set_due(page, "plain", "Buy stamps", "2026-10-16", "15:00")
+    settle(page)
+    assert page.evaluate(CALLS) == [] and page.locator("#calbar").count() == 0
+    assert page.evaluate(ITEM, "plain")["due"] == "2026-10-16T15:00"
+
+
+def test_a_read_only_viewer_never_reaches_the_calendar(browser):
+    page = open_page(browser, calendar=True, readOnly=True)
+    settle(page)
+    assert page.evaluate(CALLS) == [] and page.locator("#calbar").count() == 0
+    assert page.locator("li .check:not([disabled])").count() == 0

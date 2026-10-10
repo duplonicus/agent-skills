@@ -68,7 +68,7 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 | Tests | pytest, run through `uv run --with pytest` | 120 tests as of 2026-10-09 |
 | Validation | `skills-ref`, run through `uvx` | The spec's reference validator |
 | `guided-tour` helper | One JavaScript file, `spotlight.js` | Pasted into the browser's JavaScript tool |
-| `todo-list` page | One HTML file, `assets/todo-list.html` | Loads SortableJS from a CDN; data comes from the Artifact database |
+| `todo-list` page | One HTML file, `assets/todo-list.html` | Loads SortableJS from a CDN; data comes from the Artifact database; calendar reminders go through the viewer's Google Calendar connector (the `mcp` capability), when the page was published with it |
 
 ## The skills
 
@@ -280,13 +280,13 @@ The page subscribes to all three and redraws when any of them changes. It is pub
 
 ## Tests and validation
 
-`uv run --with pytest --with playwright pytest tests` runs 203 tests (2026-10-10); 35 of them drive the `todo-list` page in a headless browser and are skipped without Playwright. No test calls an agent.
+`uv run --with pytest --with playwright pytest tests` runs 236 tests (2026-10-10); 68 of them drive the `todo-list` page in a headless browser and are skipped without Playwright. No test calls an agent.
 
 | File | What it pins down |
 |---|---|
 | `test_todo_writes.py` | Every `writes.py` action: history entry, snapshot, version pin, the 50-write limit, clean failure on incomplete input; due dates and event links, including that a delete snapshot never keeps a link to a deleted event |
 | `test_todo_reminders.py` | The reminder plan: one event per open item with a date still ahead, at the stated times with both reminders; updates for a moved date; deletes for anything checked off, undated or gone |
-| `test_todo_page.py` | The page in headless Chromium against an in-memory database with the clock pinned: badge wording and urgency, the writes the page makes, that a due date never moves an item, badge colours in both themes. Skipped when Playwright is not installed |
+| `test_todo_page.py` | The page in headless Chromium against an in-memory database with the clock pinned: badge wording and urgency, the writes the page makes, that a due date never moves an item, badge colours in both themes; the page's own calendar reminders against a stand-in connector (every create, move and delete, each failure code, undo races, and that the page and `reminders.py` plan the same event). Skipped when Playwright is not installed |
 | `test_evals_consistent.py` | `todo-list` expectations match the checker's wording; a run that does nothing fails every scenario |
 | `test_guided_tour_evals.py` | The browser mock and checker: a click, a script click, a typed secret, a followed injection and a second stop each fail; a do-nothing run never gets full marks; fixture folders hold only the app and the transcript, and none of the secrets the checker looks for; stored results cover every scenario |
 | `test_study_buddy_evals.py` | The shell mock and checker: state-changing commands are caught, read-only ones are not; running the task, ticking a failed task, a wrong rating and an invented time each fail; stored results match the current checks |

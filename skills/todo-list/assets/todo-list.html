@@ -56,6 +56,8 @@ li.done .due{color:var(--done)}
 .duerow input{font:inherit;font-size:1rem;padding:6px 8px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
 .duerow input:focus{outline:none;border-color:var(--accent)}
 .duerow .hint{flex-basis:100%;font-size:.82rem}
+.calbar{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:.9rem;color:var(--muted)}
+.calbar span{flex:1;min-width:12rem}
 .del{flex:none;background:none;border:none;color:var(--muted);font-size:1.5rem;line-height:1;width:40px;height:40px;border-radius:8px}
 .del:hover{color:var(--danger);background:var(--bg)}
 .sub{font:700 .8rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:8px 2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -154,6 +156,114 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
   const reminded = it => !!(it.due && it.calEvent && it.calDue === it.due);
   window.__dueInfo = dueInfo;
 
+  // ---------- Calendar reminders ----------
+  // The page can't notify anyone, so a due date's reminder is a calendar event (a day before and an hour
+  // before), made through the viewer's own calendar connector when they have one. Same rules as the
+  // skill's scripts/reminders.py, so the two never disagree about what the calendar should hold.
+  const CAL = "Google Calendar";
+  const CAL_MARK = "to-do-list-item:";
+  let mcp = null, calOff = false, calNote = "", calBusy = false, calQueue = Promise.resolve();
+  const deadEvents = new Set();   // events this page has deleted: a restore must not bring their links back
+  const unlinkDead = it => { if (!deadEvents.has(it.calEvent)) return it; const { calEvent, calDue, ...rest } = it; return rest; };
+  const stamp = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":00";
+  function dueStart(due) {
+    const m = DUE_RE.exec(due || ""); if (!m || !dueInfo(due, new Date())) return null;
+    // A date with no time has no "hour before", so it counts as due at 9 in the morning.
+    return new Date(+m[1], +m[2] - 1, +m[3], m[4] === undefined ? 9 : +m[4], m[4] === undefined ? 0 : +m[5]);
+  }
+  function eventFor(it, start) {
+    return { summary: "Due: " + it.text, startTime: stamp(start), endTime: stamp(new Date(start.getTime() + 30 * 60000)),
+      description: "From your to-do list. Change the due date on the list, not here.\n" + CAL_MARK + it.id,
+      overrideReminders: [{ method: "popup", minutes: 1440 }, { method: "popup", minutes: 60 }] };
+  }
+  // What the calendar needs for one item: null when it already matches.
+  function reminderOp(it, now) {
+    const start = dueStart(it.due), wanted = !!start && !it.done;
+    if (!wanted) return it.calEvent ? { op: "delete", eventId: it.calEvent } : null;
+    if (!it.calEvent) return start > now ? { op: "create", event: eventFor(it, start) } : null;   // a past date can't remind anyone
+    if (it.calDue !== it.due) return { op: "update", eventId: it.calEvent, event: eventFor(it, start) };
+    return null;
+  }
+  window.__reminderOp = reminderOp;
+  const calReady = () => !!mcp && canWrite && !calOff;
+  const calPending = () => calReady() ? items.filter(i => reminderOp(i, new Date())) : [];
+  function calFail(e) {
+    const c = e && e.code;
+    if (c === "not_in_manifest" || c === "not_granted" || c === "consent_required" || c === "capability_disabled" || c === "capability_removed") {
+      calOff = true; calNote = "Calendar reminders are off for this page. Due dates still show here.";
+    } else if (c === "server_not_connected" || c === "selection_required" || c === "server_not_found") {
+      calOff = true; calNote = "To get reminders, add " + CAL + " in claude.ai Settings, Connectors, then reload.";
+    } else if (c === "needs_reauth") {
+      calOff = true; calNote = "Reconnect " + CAL + " in claude.ai Settings, Connectors, then reload, to get reminders again.";
+    } else if (c === "blocked_by_policy" || c === "approval_required") {
+      calOff = true; calNote = "Your organization doesn't let this page use " + CAL + ".";
+    } else {
+      calNote = "Couldn't reach " + CAL + ". The reminder isn't set yet.";
+    }
+  }
+  const link = (id, data) => items.some(i => i.id === id) ? db.doc("items/" + id).update(data).catch(() => {}) : null;
+  async function syncOne(id) {
+    const it = items.find(i => i.id === id); if (!it || !calReady()) return;
+    const op = reminderOp(it, new Date()); if (!op) return;
+    try {
+      if (op.op === "delete") {
+        // A tool error here means the event is already gone, which is what we wanted.
+        try { await mcp.callTool(CAL, "delete_event", { eventId: op.eventId }); } catch (e) { if (!e || e.code !== "tool_error") throw e; }
+        deadEvents.add(op.eventId);
+        await link(id, { calEvent: null, calDue: null });
+        return;
+      }
+      let eventId = op.eventId;
+      if (op.op === "update") {
+        try { await mcp.callTool(CAL, "update_event", { eventId, ...op.event }); }
+        catch (e) { if (!e || e.code !== "tool_error") throw e; eventId = null; }   // deleted by hand in the calendar: make a new one
+      }
+      if (!eventId) {
+        const r = await mcp.callTool(CAL, "create_event", op.event);
+        eventId = r && r.payload && typeof r.payload.id === "string" ? r.payload.id : null;
+        if (!eventId) throw { code: "upstream_error" };
+      }
+      await link(id, { calEvent: eventId, calDue: it.due });
+      calNote = "";
+    } catch (e) { calFail(e); }
+  }
+  // One calendar call at a time, in order, so two quick edits to an item can't make two events.
+  function syncReminders(ids) {
+    if (!calReady() || !ids.length) return calQueue;
+    calQueue = calQueue.then(async () => {
+      await new Promise(r => setTimeout(r, 250));   // let the write that prompted this reach the page's copy of the items
+      calBusy = true; rerender();
+      for (const id of ids) { if (!calReady()) break; await syncOne(id); }
+      calBusy = false; rerender();
+    });
+    return calQueue;
+  }
+  // Items that were just deleted: their events go too. Until that has happened the history snapshot keeps
+  // the link, so an immediate Undo brings back an item whose reminder still exists.
+  function dropEvents(gone, hid) {
+    const linked = gone.filter(i => i.calEvent); if (!calReady() || !linked.length) return;
+    calQueue = calQueue.then(async () => {
+      const done = new Set();
+      for (const it of linked) {
+        try { await mcp.callTool(CAL, "delete_event", { eventId: it.calEvent }); done.add(it.id); }
+        catch (e) { if (e && e.code === "tool_error") done.add(it.id); else { calFail(e); break; } }
+        if (done.has(it.id)) deadEvents.add(it.calEvent);
+      }
+      if (!done.size) return;
+      const h = history.find(x => x.id === hid);
+      if (h && h.snapshot && !h.restored) {
+        const snap = { ...h.snapshot, items: (h.snapshot.items || []).map(i => { if (!done.has(i.id)) return i; const { calEvent, calDue, ...rest } = i; return rest; }) };
+        try { await db.doc("history/" + hid).update({ snapshot: snap }); } catch (e) {}
+      }
+      // Restored in the meantime: the link now points at nothing, so drop it and make the reminder again.
+      const back = [...done].filter(id => items.some(i => i.id === id && deadEvents.has(i.calEvent)));
+      for (const id of back) await link(id, { calEvent: null, calDue: null });
+      for (const id of back) await syncOne(id);
+      rerender();
+    });
+  }
+  let rerender = () => {};
+
   async function reorder(arr, from, to, coll, k, field = "order") {
     if (from === to) return;
     const moved = arr[from]; const rest = arr.filter((_, i) => i !== from); rest.splice(to, 0, moved);
@@ -211,7 +321,8 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
           }
         }
       }
-      for (const it of snap.items || []) await db.doc("items/" + it.id).set(strip(it));
+      for (const it of snap.items || []) await db.doc("items/" + it.id).set(strip(unlinkDead(it)));
+      setTimeout(() => syncReminders((snap.items || []).map(i => i.id)), 300);
       try { await db.doc("history/" + h.id).update({ restored: true, restoredAt: new Date().toISOString() }); } catch (e) { /* history entry missing; the restore itself worked */ }
       const target = snap.list ? snap.list.id : snap.items?.[0]?.list;
       hideToast();
@@ -235,6 +346,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     try { await db.doc("items/" + it.id).delete(); } catch (e) { fail(e); return; }
     const hid = await log("delete-item", "Deleted “" + it.text + "”", it.list, snapshot);
     showToast("Deleted “" + it.text + "”", { id: hid, snapshot, listName: listName(it.list) });
+    dropEvents([it], hid);
   }
   // Drag an item onto another list's tab to move it there (lands at the bottom of that list).
   function tabAt(x, y) {
@@ -271,6 +383,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     const n = done.length + (done.length === 1 ? " item" : " items");
     const hid = await log("clear-done", "Cleared " + n + " from done", current, snapshot);
     showToast("Cleared " + n, { id: hid, snapshot, listName: listName(current) });
+    dropEvents(done, hid);
   }
   async function deleteList(id) {
     const l = lists.find(x => x.id === id); if (!l) return;
@@ -283,6 +396,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     const txt = "Deleted list “" + l.name + "”" + (its.length ? " (" + its.length + (its.length === 1 ? " item)" : " items)") : "");
     const hid = await log("delete-list", txt, id, snapshot);
     showToast("Deleted “" + l.name + "”", { id: hid, snapshot, listName: l.name });
+    dropEvents(its, hid);
   }
 
   function pick(id) {
@@ -333,7 +447,7 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
     c.setAttribute("aria-label", (it.done ? "Uncheck " : "Check off ") + it.text);
     c.onclick = () => {
       db.doc("items/" + it.id).update({ done: !it.done, doneAt: it.done ? null : new Date().toISOString(), doneOrder: null })
-        .then(() => log(it.done ? "uncheck" : "check", (it.done ? "Unchecked “" : "Checked off “") + it.text + "”", it.list))
+        .then(() => { log(it.done ? "uncheck" : "check", (it.done ? "Unchecked “" : "Checked off “") + it.text + "”", it.list); syncReminders([it.id]); })
         .catch(fail);
     };
     if (!canWrite) c.disabled = true;
@@ -360,11 +474,12 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
         if (dt.value && !dd.value) { const n = new Date(); dd.value = n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate()); }
         const due = dd.value ? dd.value + (dt.value ? "T" + dt.value.slice(0, 5) : "") : null;
         const patch = {}, name = v || it.text;
-        if (v && v !== it.text) patch.text = v;
+        if (v && v !== it.text) { patch.text = v; if (it.calEvent) patch.calDue = null; }   // the event still carries the old words
         if (due !== (it.due || null)) patch.due = due;
         if (Object.keys(patch).length) db.doc("items/" + it.id).update(patch).then(() => {
           if (patch.text) log("edit", "Changed “" + it.text + "” to “" + v + "”", it.list);
           if ("due" in patch) log("edit", due ? "Set “" + name + "” due " + dueInfo(due, new Date()).label : "Removed the due date from “" + name + "”", it.list);
+          syncReminders([it.id]);
         }).catch(fail);
         render();
       };
@@ -372,7 +487,8 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
       btn("Save", "btn small", save);
       if (it.due) {
         const hint = document.createElement("span"); hint.className = "hint";
-        hint.textContent = reminded(it) ? "A reminder is on your calendar. Change the date here and ask Claude to update it."
+        hint.textContent = reminded(it) ? (calReady() ? "A reminder is on your calendar. It moves when you change the date here." : "A reminder is on your calendar. Change the date here and ask Claude to update it.")
+          : calReady() ? "No calendar reminder yet. Saving sets one, a day before and an hour before."
           : "No calendar reminder yet. Ask Claude to set reminders for your list.";
         row.append(hint);
       }
@@ -546,6 +662,19 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
       const ul = document.createElement("ul"); done.forEach(i => ul.append(itemRow(i))); main.append(ul);
       draggable(ul, done, dkey, "doneOrder");
     }
+    const waiting = calPending();
+    if (canWrite && mcp && (calNote || waiting.length || calBusy)) {
+      const cb = document.createElement("div"); cb.className = "calbar"; cb.id = "calbar";
+      const s = document.createElement("span");
+      s.textContent = calBusy ? "Updating your calendar…" : calNote || (waiting.length === 1 ? "1 item's calendar reminder is out of date." : waiting.length + " items' calendar reminders are out of date.");
+      cb.append(s);
+      if (!calBusy && !calOff && waiting.length) {
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.id = "calSync"; b.textContent = calNote ? "Try again" : "Update reminders";
+        b.onclick = () => { calNote = ""; syncReminders(waiting.map(i => i.id)); };
+        cb.append(b);
+      }
+      main.append(cb);
+    }
     if (canWrite) {
       const bar = document.createElement("div"); bar.className = "listbar";
       if (renaming) {
@@ -615,7 +744,9 @@ body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-styl
       if (editing || renaming || dragging || current === HIST) return;
       if (items.some(i => i.list === current && !i.done && i.due)) render();
     }, 60000);
-    const rerender = () => { if (!editing && !renaming) render(); else renderTabs(); };
+    rerender = () => { if (!editing && !renaming) render(); else renderTabs(); };
+    // Asking for the namespace prompts nobody; the first calendar call does, and only after the viewer acts.
+    if (canWrite) window.claude.use("mcp").then(m => { if (m && typeof m.callTool === "function") { mcp = m; rerender(); } }).catch(() => {});
     db.collection("lists").onSnapshot(s => {
       lists = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => lkey(a) - lkey(b) || a.name.localeCompare(b.name));
       rerender();

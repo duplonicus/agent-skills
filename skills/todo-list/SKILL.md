@@ -67,6 +67,8 @@ An item can carry a `due` field: a date (`2026-10-16`) or a date and time (`2026
 
 The page can't notify anyone, so **the reminder is a calendar event**: one event per open item with a due date, with a pop-up reminder one day before and one hour before. A date with no time counts as due at 9:00 that morning. The item remembers its event in `calEvent`, and in `calDue` the due date that event was made for; the page shows a bell only while `calDue` equals `due`.
 
+**The page also does this by itself** when it was published with the calendar connector (section 6) and the person has Google Calendar connected: setting, changing or removing a date on the page, checking an item off, or deleting it creates, moves or removes the event right then, using the same rules as `reminders.py`. So after a change made on the page there is usually nothing left for you to do, and `reminders.py plan` returns `[]`. Changes made from chat are still yours to sync; the page only shows an "Update reminders" button for them.
+
 **No calendar tool in this session?** Set the due date anyway and say in the reply that it shows on the list but no reminder was set. Never write `--event-id` for an event you did not create.
 
 **Setting a due date from chat** (calendar tool available):
@@ -90,7 +92,10 @@ Keep it to one line: what changed and on which list ("Added paper towels and cof
 The page ships with this skill as `assets/todo-list.html`. If the person asked to add something and you found no list artifact, tell them in a line and offer to set one up; if they asked for a list or checklist to be made, just do it.
 
 1. Copy `assets/todo-list.html` into your working directory (or scratchpad) as `todo-list.html`. Leave its content alone; the page expects the schema in `references/schema.md`.
-2. Publish it: `Artifact` with `file_path` set to that copy, `capabilities: {"db": {}, "user": {}}`, `icon: "checklist"`, and a one-sentence `description`. `db` holds the lists; `user` lets the page hide edit controls from people who can only view.
+2. Publish it: `Artifact` with `file_path` set to that copy, `icon: "checklist"`, a one-sentence `description`, and `capabilities`:
+   - If this session has a Google Calendar connector: `{"db": {}, "user": {}, "mcp": {"servers": [{"server": "<its connector segment, e.g. claude_ai_Google_Calendar>", "tools": ["create_event", "update_event", "delete_event"]}]}}`. That lets the page make calendar reminders for due dates itself. The page calls the connector by its display name, "Google Calendar"; if the publish result names it differently, change the `CAL` constant near the top of the page's script and publish again.
+   - Otherwise: `{"db": {}, "user": {}}`. Due dates still work; reminders then come only from chat.
+   - `db` holds the lists; `user` lets the page hide edit controls from people who can only view. On any later republish with `capabilities`, restate all of them: a non-empty declaration drops whatever it leaves out.
 3. Seed the lists through the database, not the HTML: run `writes.py new-list` for each list they want (default to one "Shopping" and one "Todo" if they didn't say), then add any items they mentioned. A page that hardcodes starting data would reset them on every republish.
 4. Check it worked: `ArtifactData` `list` on `lists` and `items` should show what you wrote.
 5. Tell them in one or two lines: the page is private until they share it, they can type into it directly or ask you, and History can restore anything deleted. Offer once to pin it to their sidebar (`Artifact` `action: "pin"`, only on a yes). Save the URL to memory if you can.
