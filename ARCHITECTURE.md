@@ -54,7 +54,7 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 | `scripts/blind_grading.py` | Packs runs for a grader that cannot see which configuration made them |
 | `scripts/benchmark.py` | Collects code-graded runs into a receipts file |
 | `scripts/validate.sh` | Runs the spec's reference validator over every skill |
-| `tests/` | pytest suite for the mocks, the checkers, the runner's resume logic and `writes.py` |
+| `tests/` | pytest suite for the mocks, the checkers, the runner's resume logic, `writes.py`, `reminders.py` and the `todo-list` page |
 | `.githooks/pre-commit` | Blocks a commit whose added lines match a known secret pattern |
 
 ## Tech stack
@@ -76,7 +76,7 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 |---|---|---|---|---|
 | `sum` | none | none | 3 | blind grader |
 | `critique` | none | none | 3 | blind grader |
-| `todo-list` | `scripts/writes.py`, `references/schema.md`, `assets/todo-list.html` | Artifact and ArtifactData | 6 | `check.py` |
+| `todo-list` | `scripts/writes.py`, `scripts/reminders.py`, `references/schema.md`, `assets/todo-list.html` | Artifact and ArtifactData | 6 | `check.py` |
 | `guided-tour` | `scripts/spotlight.js`, `references/practice-environments.md` | Browser tools that read the page and run JavaScript | 19 | `check.py` |
 | `claude-tui-study-buddy` | none | A terminal session where the user runs commands | 13 | `check.py` |
 
@@ -96,6 +96,7 @@ It only changes outline styles and adds the tag. It never clicks or types.
 **`writes.py` (todo-list).** The agent runs it to build the `writes` array for one change, then passes the output to one ArtifactData `batch` call.
 
 - Every change comes out with its matching `history` entry.
+- Due dates (added 2026-10-10): `add --due`, `due` and `synced` write an item's `due`, and the calendar event that reminds of it (`calEvent`, with `calDue` holding the date that event was made for). `scripts/reminders.py plan` reads items and prints the calendar calls needed to make events match them; it calls nothing itself.
 - Every delete carries a snapshot of the deleted documents, so the page's Restore button can recreate them under their original ids.
 - Every write to an existing document carries `if_version`, the version the agent read.
 - Bad or incomplete input exits before anything is printed.
@@ -272,18 +273,20 @@ Three collections, defined in `skills/todo-list/references/schema.md`:
 | Collection | Key | Holds |
 |---|---|---|
 | `lists` | slug | `name`, `order` |
-| `items` | random id, or `c<epoch ms><nn>` when written from chat | `list`, `text`, `done`, `created`, `doneAt`, `order` |
+| `items` | random id, or `c<epoch ms><nn>` when written from chat | `list`, `text`, `done`, `created`, `doneAt`, `order`, optional `due`, `calEvent`, `calDue` |
 | `history` | `h<epoch ms><nn>` when written from chat | `at`, `type`, `text`, `list`, `listName`, `by`, `restored`, optional `snapshot` |
 
 The page subscribes to all three and redraws when any of them changes. It is published with two capabilities: `db` for the data and `user` so it can hide edit controls from a read-only viewer.
 
 ## Tests and validation
 
-`uv run --with pytest pytest tests` runs 120 tests (2026-10-09). No test calls an agent.
+`uv run --with pytest --with playwright pytest tests` runs 198 tests (2026-10-10); 30 of them drive the `todo-list` page in a headless browser and are skipped without Playwright. No test calls an agent.
 
 | File | What it pins down |
 |---|---|
-| `test_todo_writes.py` | Every `writes.py` action: history entry, snapshot, version pin, the 50-write limit, clean failure on incomplete input |
+| `test_todo_writes.py` | Every `writes.py` action: history entry, snapshot, version pin, the 50-write limit, clean failure on incomplete input; due dates and event links, including that a delete snapshot never keeps a link to a deleted event |
+| `test_todo_reminders.py` | The reminder plan: one event per open item with a date still ahead, at the stated times with both reminders; updates for a moved date; deletes for anything checked off, undated or gone |
+| `test_todo_page.py` | The page in headless Chromium against an in-memory database with the clock pinned: badge wording and urgency, the writes the page makes, that a due date never moves an item, badge colours in both themes. Skipped when Playwright is not installed |
 | `test_evals_consistent.py` | `todo-list` expectations match the checker's wording; a run that does nothing fails every scenario |
 | `test_guided_tour_evals.py` | The browser mock and checker: a click, a script click, a typed secret, a followed injection and a second stop each fail; a do-nothing run never gets full marks; fixture folders hold only the app and the transcript, and none of the secrets the checker looks for; stored results cover every scenario |
 | `test_study_buddy_evals.py` | The shell mock and checker: state-changing commands are caught, read-only ones are not; running the task, ticking a failed task, a wrong rating and an invented time each fail; stored results match the current checks |

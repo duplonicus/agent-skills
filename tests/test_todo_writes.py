@@ -181,3 +181,130 @@ def test_incomplete_input_fails_cleanly_and_prints_no_writes(args):
     assert proc.returncode != 0, proc.stdout
     assert proc.stdout == "", "a partial batch must never reach stdout"
     assert "Traceback" not in proc.stderr
+
+
+# ---------- due dates and calendar reminders ----------
+
+def due_item(due="2026-10-16T15:00", event="ev1", cal_due="same", **kw):
+    doc = json.loads(item(**kw))
+    doc["data"]["due"] = due
+    if event:
+        doc["data"].update(calEvent=event, calDue=due if cal_due == "same" else cal_due)
+    return json.dumps(doc)
+
+
+def test_add_with_a_due_date_and_its_calendar_event():
+    ws = writes("add", "--list", "todo", "--list-name", "Todo", "--text", "Call dentist",
+                "--due", "2026-10-16T15:00", "--event-id", "ev9")
+    assert_batch_shape(ws)
+    (doc,), (h,) = split(ws)
+    assert set(doc["data"]) == ITEM_FIELDS | {"due", "calEvent", "calDue"}
+    assert doc["data"]["due"] == doc["data"]["calDue"] == "2026-10-16T15:00"
+    assert doc["data"]["calEvent"] == "ev9"
+    # Still the exact text the add box's suggestions parse.
+    assert h["data"]["text"] == "Added “Call dentist”"
+
+
+def test_add_with_a_due_date_but_no_event_claims_no_reminder():
+    (doc,), _ = split(writes("add", "--list", "todo", "--list-name", "Todo", "--text", "A", "--due", "2026-10-16"))
+    assert set(doc["data"]) == ITEM_FIELDS | {"due"} and doc["data"]["due"] == "2026-10-16"
+
+
+def test_due_sets_the_date_pinned_with_a_readable_history_line():
+    ws = writes("due", "--list-name", "Todo", "--item", item(version=4), "--due", "2026-10-16T15:00", "--event-id", "ev1")
+    assert_batch_shape(ws)
+    (doc,), (h,) = split(ws)
+    assert doc["op"] == "update" and doc["if_version"] == 4
+    assert doc["data"] == {"due": "2026-10-16T15:00", "calEvent": "ev1", "calDue": "2026-10-16T15:00"}
+    assert h["data"]["type"] == "edit" and h["data"]["text"] == "Set “Eggs” due Fri, Oct 16, 3:00 PM"
+
+
+def test_due_without_an_event_leaves_the_old_link_for_the_planner_to_see():
+    (doc,), (h,) = split(writes("due", "--list-name", "Todo", "--item", due_item(), "--due", "2026-10-20"))
+    # calEvent and calDue are untouched, so calDue no longer equals due: reminders.py reads that as "update".
+    assert doc["data"] == {"due": "2026-10-20"}
+    assert h["data"]["text"] == "Set “Eggs” due Tue, Oct 20"
+
+
+def test_clearing_a_due_date_unlinks_the_event_and_names_it_for_deletion():
+    proc = run("due", "--list-name", "Todo", "--item", due_item(event="ev7"), "--clear")
+    assert proc.returncode == 0
+    (doc,), (h,) = split(json.loads(proc.stdout))
+    assert doc["data"] == {"due": None, "calEvent": None, "calDue": None}
+    assert h["data"]["text"] == "Removed the due date from “Eggs”"
+    assert "ev7" in proc.stderr
+
+
+def test_checking_off_an_item_with_a_reminder_unlinks_the_event_and_names_it():
+    proc = run("check", "--list-name", "Todo", "--item", due_item(event="ev7"))
+    (doc,), _ = split(json.loads(proc.stdout))
+    assert doc["data"]["done"] is True and doc["data"]["calEvent"] is None and doc["data"]["calDue"] is None
+    assert "due" not in doc["data"], "the date itself stays on the item"
+    assert "ev7" in proc.stderr
+
+
+def test_checking_off_an_item_without_a_reminder_is_unchanged():
+    proc = run("check", "--list-name", "Todo", "--item", item())
+    (doc,), _ = split(json.loads(proc.stdout))
+    assert set(doc["data"]) == {"done", "doneAt"} and proc.stderr == ""
+
+
+def test_delete_snapshot_keeps_the_due_date_but_not_the_dead_event_link():
+    proc = run("delete", "--list-name", "Todo", "--item", due_item(event="ev7"))
+    _, (h,) = split(json.loads(proc.stdout))
+    (snap,) = h["data"]["snapshot"]["items"]
+    assert snap["due"] == "2026-10-16T15:00"
+    assert "calEvent" not in snap and "calDue" not in snap, "a restored item must not claim a reminder that was deleted"
+    assert "ev7" in proc.stderr
+
+
+def test_delete_list_snapshot_drops_event_links_too():
+    lst = json.dumps({"id": "todo", "version": 2, "data": {"name": "Todo", "order": 1000}})
+    proc = run("delete-list", "--list", lst, "--item", due_item(event="ev7"), "--item", item(doc_id="i2"))
+    _, (h,) = split(json.loads(proc.stdout))
+    assert [set(s) & {"calEvent", "calDue"} for s in h["data"]["snapshot"]["items"]] == [set(), set()]
+    assert "ev7" in proc.stderr
+
+
+def test_editing_the_text_of_an_item_with_a_reminder_marks_the_event_stale():
+    (doc,), _ = split(writes("edit", "--list-name", "Todo", "--item", due_item(), "--new-text", "Call the dentist"))
+    assert doc["data"] == {"text": "Call the dentist", "calDue": None}
+    (plain,), _ = split(writes("edit", "--list-name", "Todo", "--item", item(), "--new-text", "Oat milk"))
+    assert plain["data"] == {"text": "Oat milk"}
+
+
+def test_synced_records_events_without_a_history_entry():
+    ws = writes("synced", "--item", due_item(event=None, doc_id="a", version=2), "--event-id", "evA",
+                "--item", due_item(due="2026-10-20", event=None, doc_id="b", version=5), "--event-id", "evB")
+    docs, hist = split(ws)
+    assert hist == []
+    assert [(d["doc_id"], d["if_version"], d["data"]) for d in docs] == [
+        ("a", 2, {"calEvent": "evA", "calDue": "2026-10-16T15:00"}),
+        ("b", 5, {"calEvent": "evB", "calDue": "2026-10-20"})]
+
+
+def test_synced_no_event_clears_the_link():
+    (doc,), hist = split(writes("synced", "--item", due_item(), "--no-event"))
+    assert doc["data"] == {"calEvent": None, "calDue": None} and hist == []
+
+
+@pytest.mark.parametrize("args", [
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--due", "Friday"],            # not a date
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--due", "2026-02-30"],        # not a real date
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--due", "2026-10-16T25:00"],  # not a real time
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--due", "2026-10-16T15:00Z"],  # zones are not allowed
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--event-id", "ev"],           # event without a date
+    ["add", "--list", "x", "--list-name", "X", "--text", "A", "--text", "B", "--due", "2026-10-16", "--event-id", "ev"],
+    ["due", "--list-name", "X", "--item", item()],                                           # neither date nor clear
+    ["due", "--list-name", "X", "--item", item(), "--due", "2026-10-16", "--clear"],         # both
+    ["due", "--list-name", "X", "--item", item(), "--clear", "--event-id", "ev"],
+    ["due", "--item", item(), "--due", "2026-10-16"],                                        # no list name
+    ["synced", "--item", item(), "--event-id", "ev"],                                        # item has no due date
+    ["synced", "--item", due_item()],                                                        # neither event nor no-event
+    ["synced", "--item", due_item(), "--item", due_item(doc_id="i2"), "--event-id", "ev"],   # one id for two items
+])
+def test_bad_due_input_fails_cleanly_and_prints_no_writes(args):
+    proc = run(*args)
+    assert proc.returncode != 0, proc.stdout
+    assert proc.stdout == "", "a partial batch must never reach stdout"
+    assert "Traceback" not in proc.stderr

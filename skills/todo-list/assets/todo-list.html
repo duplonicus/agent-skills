@@ -42,8 +42,20 @@ li:first-child{border-top:none}
 li.done .check{background:var(--done);border-color:var(--done)}
 li.done .check svg{opacity:1}
 .text{flex:1;min-width:0;overflow-wrap:anywhere;cursor:text;padding:4px 0}
-li.done .text{color:var(--done);text-decoration:line-through}
-.text input{width:100%;box-sizing:border-box;padding:6px 10px;font-size:1.1rem}
+li.done .text{color:var(--done)}
+li.done .label{text-decoration:line-through}
+.text input[type=text]{width:100%;box-sizing:border-box;padding:6px 10px;font-size:1.1rem}
+/* Due date: a small line under the item, and the date and time boxes in edit mode */
+.due{display:flex;align-items:center;gap:5px;width:fit-content;font-size:.82rem;font-weight:700;color:var(--muted);margin-top:2px}
+.due svg{width:14px;height:14px;flex:none}
+.due.today{color:var(--accent)}
+.due.over{color:var(--danger)}
+li.done .due{color:var(--done)}
+.duerow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;font-size:.9rem;color:var(--muted)}
+.duerow label{font-weight:700}
+.duerow input{font:inherit;font-size:1rem;padding:6px 8px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
+.duerow input:focus{outline:none;border-color:var(--accent)}
+.duerow .hint{flex-basis:100%;font-size:.82rem}
 .del{flex:none;background:none;border:none;color:var(--muted);font-size:1.5rem;line-height:1;width:40px;height:40px;border-radius:8px}
 .del:hover{color:var(--danger);background:var(--bg)}
 .sub{font:700 .8rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:8px 2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -56,6 +68,8 @@ li.done .text{color:var(--done);text-decoration:line-through}
 .grip{flex:none;width:28px;height:40px;display:grid;place-items:center;color:var(--muted);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;font-size:1.3rem;line-height:1;margin-left:-6px}
 .grip:active{cursor:grabbing}
 .sortable-ghost{opacity:.35}
+.tab.drop{outline:3px dashed var(--accent);outline-offset:3px;transform:scale(1.06)}
+body.item-drag .tab:not(.new):not(.hist):not([aria-selected="true"]){border-style:dashed;border-color:var(--accent)}
 .sortable-chosen,.sortable-drag{background:var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.18)}
 /* History view */
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -107,10 +121,36 @@ li.done .text{color:var(--done);text-decoration:line-through}
   let db = null, lists = [], items = [], history = [], current = null, editing = null, armedDelete = false, canWrite = true;
   let renaming = false, histFilter = "all", armedClearHist = false;
   let dragging = false, pending = false, openOrder = [], justDragged = false, toastTimer = null;
+  let itemDrag = false, ptX = 0, ptY = 0, dropTab = null;
   const key = i => typeof i.order === "number" ? i.order : (Date.parse(i.created || "") || 0);
   const lkey = l => typeof l.order === "number" ? l.order : 0;
   const strip = o => { const { id, ...rest } = o; return rest; };
   const listName = id => lists.find(l => l.id === id)?.name || "";
+
+  // ---------- Due dates ----------
+  // `due` is the person's own wall-clock time, with no time zone: "2026-10-16" or "2026-10-16T15:00".
+  const BELL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7 2.5 7h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>';
+  const DUE_RE = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/;
+  const pad = n => String(n).padStart(2, "0");
+  // What the badge says and how urgent it is: state is "over", "today" or "later". Null for a value that isn't a date.
+  function dueInfo(due, now) {
+    const m = DUE_RE.exec(due || ""); if (!m) return null;
+    const [y, mo, d] = [+m[1], +m[2] - 1, +m[3]], timed = m[4] !== undefined;
+    const day = new Date(y, mo, d);
+    if (day.getFullYear() !== y || day.getMonth() !== mo || day.getDate() !== d) return null;
+    if (timed && (+m[4] > 23 || +m[5] > 59)) return null;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = Math.round((day - today) / 864e5);
+    const over = timed ? new Date(y, mo, d, +m[4], +m[5]) <= now : diff < 0;
+    let label = diff === 0 ? "today" : diff === 1 ? "tomorrow" : diff === -1 ? "yesterday"
+      : diff > 1 && diff < 7 ? day.toLocaleDateString([], { weekday: "long" })
+      : day.toLocaleDateString([], { month: "short", day: "numeric", year: y === now.getFullYear() ? undefined : "numeric" });
+    if (timed) label += ", " + new Date(y, mo, d, +m[4], +m[5]).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    return { label, state: over ? "over" : diff === 0 ? "today" : "later", text: (over ? "Overdue · " : "Due ") + label };
+  }
+  // A calendar reminder exists for exactly this due date (the assistant records both fields when it makes one).
+  const reminded = it => !!(it.due && it.calEvent && it.calDue === it.due);
+  window.__dueInfo = dueInfo;
 
   async function reorder(arr, from, to, coll, k) {
     if (from === to) return;
@@ -178,9 +218,9 @@ li.done .text{color:var(--done);text-decoration:line-through}
   }
 
   // ---------- Undo toast ----------
-  function showToast(text, entry) {
+  function showToast(text, entry, onUndo) {
     $("toastText").textContent = text;
-    $("toastUndo").onclick = () => restore(entry);
+    $("toastUndo").onclick = onUndo || (() => restore(entry));
     $("toast").hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(hideToast, 7000);
@@ -194,6 +234,35 @@ li.done .text{color:var(--done);text-decoration:line-through}
     const hid = await log("delete-item", "Deleted “" + it.text + "”", it.list, snapshot);
     showToast("Deleted “" + it.text + "”", { id: hid, snapshot, listName: listName(it.list) });
   }
+  // Drag an item onto another list's tab to move it there (lands at the bottom of that list).
+  function tabAt(x, y) {
+    for (const el of document.elementsFromPoint(x, y)) {
+      const t = el.closest && el.closest(".tab[data-id]");
+      if (t) return t;
+    }
+    return null;
+  }
+  function trackPointer(e) {
+    const p = e.touches ? e.touches[0] : e; if (!p) return;
+    ptX = p.clientX; ptY = p.clientY;
+    if (!itemDrag) return;
+    const t = tabAt(ptX, ptY);
+    const target = t && t.dataset.id !== current ? t : null;
+    if (target !== dropTab) { dropTab?.classList.remove("drop"); dropTab = target; dropTab?.classList.add("drop"); }
+  }
+  for (const ev of ["pointermove", "mousemove", "touchmove"]) window.addEventListener(ev, trackPointer, { capture: true, passive: true });
+  async function moveItem(it, to) {
+    const from = it.list, oldOrder = it.order ?? null;
+    const top = items.filter(i => i.list === to && !i.done).reduce((m, i) => Math.max(m, key(i)), 0);
+    try { await db.doc("items/" + it.id).update({ list: to, order: Math.max(Date.now(), top + 1000) }); } catch (e) { fail(e); return; }
+    const txt = "Moved “" + it.text + "” to " + listName(to);
+    log("edit", txt, to);
+    showToast(txt, null, async () => {
+      hideToast();
+      try { await db.doc("items/" + it.id).update({ list: from, order: oldOrder }); log("edit", "Moved “" + it.text + "” back to " + listName(from), from); } catch (e) { fail(e); }
+    });
+  }
+
   async function clearDone(done) {
     const snapshot = { items: done };
     for (const i of done) { try { await db.doc("items/" + i.id).delete(); } catch (e) { fail(e); break; } }
@@ -254,7 +323,7 @@ li.done .text{color:var(--done);text-decoration:line-through}
     if (it.done) li.className = "done";
     if (!it.done && canWrite) {
       const g = document.createElement("span"); g.className = "grip"; g.textContent = "⠿";
-      g.setAttribute("aria-hidden", "true"); g.title = "Drag to reorder";
+      g.setAttribute("aria-hidden", "true"); g.title = "Drag to reorder, or onto another list's tab to move it";
       li.append(g);
     }
     const c = document.createElement("button");
@@ -269,21 +338,58 @@ li.done .text{color:var(--done);text-decoration:line-through}
     const tx = document.createElement("div"); tx.className = "text";
     if (editing === it.id) {
       const inp = document.createElement("input"); inp.type = "text"; inp.id = "edit-" + it.id; inp.value = it.text;
+      inp.setAttribute("aria-label", "Item text");
+      const cur = DUE_RE.test(it.due || "") ? it.due.split("T") : [];
+      const row = document.createElement("div"); row.className = "duerow";
+      const lab = document.createElement("label"); lab.textContent = "Due"; lab.htmlFor = "due-date-" + it.id;
+      const dd = document.createElement("input"); dd.type = "date"; dd.id = "due-date-" + it.id; dd.value = cur[0] || "";
+      const dt = document.createElement("input"); dt.type = "time"; dt.id = "due-time-" + it.id; dt.value = cur[1] || "";
+      dt.setAttribute("aria-label", "Due time (optional)");
+      row.append(lab, dd, dt);
+      // Buttons keep the focus where it is, so tapping one doesn't count as leaving the editor.
+      const btn = (text, cls, fn) => {
+        const b = document.createElement("button"); b.type = "button"; b.className = cls; b.textContent = text;
+        b.onmousedown = e => e.preventDefault(); b.onclick = fn; row.append(b); return b;
+      };
       let saved = false;
       const save = () => {
         if (saved) return; saved = true;
         const v = inp.value.trim(); editing = null;
-        if (v && v !== it.text) db.doc("items/" + it.id).update({ text: v })
-          .then(() => log("edit", "Changed “" + it.text + "” to “" + v + "”", it.list)).catch(fail);
+        if (dt.value && !dd.value) { const n = new Date(); dd.value = n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate()); }
+        const due = dd.value ? dd.value + (dt.value ? "T" + dt.value.slice(0, 5) : "") : null;
+        const patch = {}, name = v || it.text;
+        if (v && v !== it.text) patch.text = v;
+        if (due !== (it.due || null)) patch.due = due;
+        if (Object.keys(patch).length) db.doc("items/" + it.id).update(patch).then(() => {
+          if (patch.text) log("edit", "Changed “" + it.text + "” to “" + v + "”", it.list);
+          if ("due" in patch) log("edit", due ? "Set “" + name + "” due " + dueInfo(due, new Date()).label : "Removed the due date from “" + name + "”", it.list);
+        }).catch(fail);
         render();
       };
-      inp.onkeydown = e => { if (e.key === "Enter") save(); if (e.key === "Escape") { saved = true; editing = null; render(); } };
-      inp.onblur = save;
-      tx.append(inp);
+      if (it.due) btn("No due date", "btn ghost small", () => { dd.value = ""; dt.value = ""; save(); });
+      btn("Save", "btn small", save);
+      if (it.due) {
+        const hint = document.createElement("span"); hint.className = "hint";
+        hint.textContent = reminded(it) ? "A reminder is on your calendar. Change the date here and ask Claude to update it."
+          : "No calendar reminder yet. Ask Claude to set reminders for your list.";
+        row.append(hint);
+      }
+      tx.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); save(); } if (e.key === "Escape") { saved = true; editing = null; render(); } };
+      // Leaving the whole editor saves; moving between its boxes does not.
+      tx.addEventListener("focusout", () => setTimeout(() => { if (!saved && !tx.contains(document.activeElement)) save(); }, 0));
+      tx.append(inp, row);
       setTimeout(() => { inp.focus(); inp.select(); }, 0);
     } else {
-      tx.textContent = it.text;
-      if (canWrite) { tx.title = "Tap to edit"; tx.onclick = () => { editing = it.id; render(); }; }
+      const label = document.createElement("span"); label.className = "label"; label.textContent = it.text;
+      tx.append(label);
+      const info = dueInfo(it.due, new Date());
+      if (info) {
+        const b = document.createElement("div"); b.className = "due" + (it.done ? "" : " " + info.state);
+        if (reminded(it) && !it.done) { b.innerHTML = BELL; b.title = "A reminder is on your calendar"; }
+        b.append(it.done ? "Was due " + info.label : info.text);
+        tx.append(b);
+      }
+      if (canWrite) { tx.title = "Tap to edit or set a due date"; tx.onclick = () => { editing = it.id; render(); }; }
     }
     li.append(c, tx);
     if (canWrite) {
@@ -412,9 +518,17 @@ li.done .text{color:var(--done);text-decoration:line-through}
       main.append(e);
     } else {
       const ul = document.createElement("ul"); open.forEach(i => ul.append(itemRow(i))); main.append(ul);
-      if (canWrite && window.Sortable && open.length > 1) {
+      if (canWrite && window.Sortable) {
         Sortable.create(ul, { ...sortOpts, handle: ".grip",
-          onEnd: e => { const arr = openOrder; endDrag(); reorder(arr, e.oldIndex, e.newIndex, "items", key).then(() => { if (!dragging) render(); }); render(); } });
+          onStart: () => { dragging = true; itemDrag = true; document.body.classList.add("item-drag"); },
+          onEnd: e => {
+            const arr = openOrder;
+            const t = dropTab || tabAt(ptX, ptY);
+            itemDrag = false; document.body.classList.remove("item-drag"); dropTab?.classList.remove("drop"); dropTab = null;
+            endDrag();
+            if (t && t.dataset.id && t.dataset.id !== current && lists.some(l => l.id === t.dataset.id)) { moveItem(arr[e.oldIndex], t.dataset.id); render(); return; }
+            reorder(arr, e.oldIndex, e.newIndex, "items", key).then(() => { if (!dragging) render(); }); render();
+          } });
       }
     }
     if (done.length) {
@@ -492,6 +606,11 @@ li.done .text{color:var(--done);text-decoration:line-through}
         onEnd: e => { const arr = lists.slice(); endDrag(); reorder(arr, e.oldIndex, e.newIndex, "lists", lkey); render(); } });
     }
     const onErr = () => showNotice("Lost the connection to your lists. Reload the page.");
+    // "Due today" turns into "Overdue" on its own while the page sits open.
+    setInterval(() => {
+      if (editing || renaming || dragging || current === HIST) return;
+      if (items.some(i => i.list === current && !i.done && i.due)) render();
+    }, 60000);
     const rerender = () => { if (!editing && !renaming) render(); else renderTabs(); };
     db.collection("lists").onSnapshot(s => {
       lists = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => lkey(a) - lkey(b) || a.name.localeCompare(b.name));

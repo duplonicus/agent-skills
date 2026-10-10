@@ -1,11 +1,11 @@
 ---
 name: todo-list
-description: Keeps the person's lists (shopping, groceries, todo, any store or errand list) in a To-Do List artifact backed by a live database, and sets that artifact up if they don't have one yet. Use it whenever someone asks to add, check off, cross out, remove, move or rename something on a list, asks what's on a list, says "show me my list", "put X on my Costco list", "I'm out of milk", "make a list for the hardware store", or wants a list or checklist they can edit by hand and through chat, even if they never say "artifact".
+description: Keeps the person's lists (shopping, groceries, todo, any store or errand list) in a To-Do List artifact backed by a live database, and sets that artifact up if they don't have one yet. Use it whenever someone asks to add, check off, cross out, remove, move or rename something on a list, asks what's on a list, says "show me my list", "put X on my Costco list", "I'm out of milk", "make a list for the hardware store", or wants a list or checklist they can edit by hand and through chat, even if they never say "artifact". Also use it for due dates and reminders on list items, like "add X due Friday at 3", "remind me about X", "when is X due", "sync my reminders".
 license: MIT
-compatibility: Needs Claude's Artifact and ArtifactData tools (a published artifact page with a shared database), and Python 3 to run the helper script.
+compatibility: Needs Claude's Artifact and ArtifactData tools (a published artifact page with a shared database), and Python 3 to run the helper scripts. Reminders also need a calendar tool that can create events with custom reminder times; without one, due dates still show on the page.
 metadata:
   author: duplonicus
-  version: "1.0"
+  version: "1.1"
 ---
 
 # To-Do List
@@ -20,7 +20,7 @@ Look in this order and stop at the first hit:
 
 1. **Their notes.** If a memory tool or saved preferences mention a To-Do List / lists artifact URL, use it.
 2. **Their artifacts.** `Artifact` with `action: "list"` (scope `mine`, limit 50). Look for a title like "To-Do List", "Lists", "Shopping list". If several fit, ask which one.
-3. **Nothing found** → go to section 5 (set one up).
+3. **Nothing found** → go to section 6 (set one up).
 
 If you found it via step 2 and the session has a memory tool, save the URL there so next time is instant.
 
@@ -49,6 +49,8 @@ python3 <skill-dir>/scripts/writes.py delete --list-name Costco --item '<item do
 python3 <skill-dir>/scripts/writes.py new-list --name "Hardware store" --existing-slugs costco,todo --order <max list order + 1000>
 ```
 
+Due dates: `add ... --due 2026-10-16T15:00`, `due --list-name Todo --item '<item doc>' --due 2026-10-16` (or `--clear`). Section 4 covers the reminder that goes with one.
+
 Also: `uncheck`, `edit --new-text`, `rename --list <slug> --old-name --name --version`, `delete-list --list '<list doc>' --item ...` (pass every item on that list so the snapshot can restore them). `--item` takes the full document `{"id","data","version"}` from your read. That version is what stops you overwriting a change someone just made on the page.
 
 Why the history entry matters: History is the page's undo. Add entries also feed the add box's autocomplete, and a delete without a snapshot can't be restored. Writing items without their history entry leaves the page quietly inconsistent, which is why the helper always emits both.
@@ -59,11 +61,31 @@ Notes:
 - If the batch fails on a version conflict, someone edited that doc on the page. Re-read it, rebuild the writes, try once more.
 - "Move X to the Costco list": `writes.py move --list costco --list-name Costco --item '<item doc>'`.
 
-## 4. Reply
+## 4. Due dates and reminders
+
+An item can carry a `due` field: a date (`2026-10-16`) or a date and time (`2026-10-16T15:00`). It is the person's own wall-clock time, with no time zone and no `Z`. Work out "Friday" or "tomorrow at 3" from today's date in their zone; if you can't tell which day they mean, ask. The page shows it under the item, turns it red when it is overdue, and lets them set or change it by tapping the item.
+
+The page can't notify anyone, so **the reminder is a calendar event**: one event per open item with a due date, with a pop-up reminder one day before and one hour before. A date with no time counts as due at 9:00 that morning. The item remembers its event in `calEvent`, and in `calDue` the due date that event was made for; the page shows a bell only while `calDue` equals `due`.
+
+**No calendar tool in this session?** Set the due date anyway and say in the reply that it shows on the list but no reminder was set. Never write `--event-id` for an event you did not create.
+
+**Setting a due date from chat** (calendar tool available):
+1. Run `python3 <skill-dir>/scripts/reminders.py plan --item '<item doc with the new due date>'`. For an item that doesn't exist yet, add it first without `--event-id`, re-read it, then plan. The output is the exact calendar call to make: `event` holds the title, start, end, description and reminders. Pass the times as given and do not add a time zone.
+2. Make the call (create, update or delete), then record it: `writes.py synced --item '<item doc>' --event-id <id the calendar returned>`, or `--no-event` after a delete. Send that as a batch like any other change.
+
+**Whenever you've read a list's items for any reason,** run `reminders.py plan` on them with one `--item` each. It is a local script and costs nothing. `[]` means the calendar already matches. Anything else is a change someone made on the page that the calendar hasn't caught up with (a date moved, an item checked off, a due date set by hand): make those calls and record them with `synced`. This is how a date set on the page gets its reminder.
+
+**When `writes.py` prints "Delete these calendar events too"** (on check, delete, delete-list or `due --clear`), delete those events. The helper has already dropped the link from the item, so nothing else will remember them.
+
+**"Sync my reminders"**, or any time you want to be thorough: read every item, search the calendar for upcoming events whose description contains `to-do-list-item:`, and run `reminders.py plan --all-items --item ... --event <event id>=<item id from that line> ...`. This also finds events left behind by items deleted on the page, which no other step can see.
+
+Past due dates get no event. Tell the person the reminder times in the reply when you set one ("Added, due Fri 3:00 PM. Reminders set for Thu 3:00 PM and Fri 2:00 PM.").
+
+## 5. Reply
 
 Keep it to one line: what changed and on which list ("Added paper towels and coffee to Costco."). When they ask to **see** the list, use `Artifact` `action: "open"` with the URL instead of pasting the items. When they ask **what's on** a list, answer in chat from the items you read: open items first, then how many are done.
 
-## 5. No list artifact yet: set one up
+## 6. No list artifact yet: set one up
 
 The page ships with this skill as `assets/todo-list.html`. If the person asked to add something and you found no list artifact, tell them in a line and offer to set one up; if they asked for a list or checklist to be made, just do it.
 

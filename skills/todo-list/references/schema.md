@@ -19,8 +19,13 @@ The doc id is the slug (`shopping`, `hardware-store`). `__history` is reserved f
 | created | ISO time | |
 | doneAt | ISO time or null | Set when checked, null when unchecked. The Done section sorts by it. |
 | order | number | Sort key for open items, lower = higher up. New items use epoch ms. Missing → falls back to `created`. |
+| due | string or null, optional | `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM`, the person's own wall-clock time with no zone. The page shows it under the item and marks it overdue; it never reorders items. Anything else is ignored. |
+| calEvent | string or null, optional | Id of the calendar event that reminds the person of this item. Only the assistant writes it. |
+| calDue | string or null, optional | The `due` value that event was made for. The page shows the reminder bell only while it equals `due`, so a date changed on the page shows no bell until `scripts/reminders.py` has been acted on. |
 
 Items the page creates get random ids; items written from chat use `c<epochms><nn>`. Both are fine.
+
+The page sets and clears `due` and leaves `calEvent` and `calDue` alone. Checking off or deleting an item from chat clears both (the event is deleted with it), and delete snapshots are stored without them so a restored item never claims a reminder that is gone. A calendar event's description ends with the line `to-do-list-item:<item id>`, which is how leftover events are found.
 
 ## `history/<id>`
 | field | type | notes |
