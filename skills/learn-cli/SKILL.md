@@ -1,6 +1,6 @@
 ---
-name: claude-tui-study-buddy
-description: Hands-on practice partner for anything learned at a terminal (Linux, Git, Docker, kubectl, SQL shells, any CLI). The user types every command themselves in the session's own shell so the output lands in the conversation; the agent sets one small task at a time, gives hints instead of answers, reads each result, ticks a checklist, then quizzes from memory and gives an honest skill rating. Use whenever someone wants to practise, drill, study or be quizzed on command-line skills, including "help me practise git", "drill me on Linux", "I have an interview on X, let's study", "work through my study guide with me" or "quiz me on these commands", even if they never say "study buddy". Not for web UIs (that is a guided tour), not for questions answerable in one reply, and not for running the commands for them.
+name: learn-cli
+description: Hands-on practice partner for anything learned at a terminal (Linux, Git, Docker, kubectl, SQL shells, any CLI). The user types every command themselves in the session's own shell so the output lands in the conversation; the agent sets one small task at a time, gives hints instead of answers, reads each result, ticks a checklist, then quizzes from memory and gives an honest skill rating. Use whenever someone wants to practise, drill, study or be quizzed on command-line skills, including "help me practise git", "drill me on Linux", "I have an interview on X, let's study", "work through my study guide with me" or "quiz me on these commands", even if they never say "study buddy". Not for web UIs (that is learn-web), not for learning a codebase (that is learn-repo), not for questions answerable in one reply, and not for running the commands for them.
 license: MIT
 compatibility: Needs a terminal agent where the user can run shell commands inside the session and the output lands in the conversation. Written for Claude Code, where a line starting with ! does that. Elsewhere the user can paste their output instead.
 metadata:
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# Study Buddy (terminal)
+# Learn CLI
 
 Practise command-line skills by doing them, one small task at a time:
 

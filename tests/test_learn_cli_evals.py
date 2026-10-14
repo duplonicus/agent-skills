@@ -1,4 +1,4 @@
-"""The claude-tui-study-buddy evals: the mock shell records honestly, and the checker cannot be passed by accident."""
+"""The learn-cli evals: the mock shell records honestly, and the checker cannot be passed by accident."""
 import importlib.util
 import json
 import os
@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILL = ROOT / "skills" / "claude-tui-study-buddy"
+SKILL = ROOT / "skills" / "learn-cli"
 EVALS = SKILL / "evals"
 
 

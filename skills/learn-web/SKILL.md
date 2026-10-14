@@ -1,6 +1,6 @@
 ---
-name: guided-tour
-description: Gets a person up to speed on a product or console they don't know yet, by walking them through the real thing. Live, hand-holding guided tour of a web app in the user's own browser. Claude navigates, spotlights each control, explains it, gives a small try-it task, then waits at every stop while the user pokes around and asks questions. Use whenever someone wants to learn or be walked through a web UI or console (Jaeger, Grafana, Kibana, Datadog, M365 admin center, Entra, Intune, AWS, GCP, Azure, Jira, ServiceNow, Zendesk, any SaaS), including "teach me X", "show me around X", "how do I use X", or "walk me through X", even if they never say "tour". Not for questions answerable in one reply, or for doing the task for them.
+name: learn-web
+description: Gets a person up to speed on a product or console they don't know yet, by walking them through the real thing. Live, hand-holding guided tour of a web app in the user's own browser. Claude navigates, spotlights each control, explains it, gives a small try-it task, then waits at every stop while the user pokes around and asks questions. Use whenever someone wants to learn or be walked through a web UI or console (Jaeger, Grafana, Kibana, Datadog, M365 admin center, Entra, Intune, AWS, GCP, Azure, Jira, ServiceNow, Zendesk, any SaaS), including "teach me X", "show me around X", "how do I use X", or "walk me through X", even if they never say "tour". Not for command-line tools (that is learn-cli) or code repositories (that is learn-repo), not for questions answerable in one reply, and not for doing the task for them.
 license: MIT
 compatibility: Needs browser-automation tools that can read the open page and run JavaScript in it. Written for Claude's browser tools (Claude in Chrome or the desktop app's built-in browser).
 metadata:
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# Guided Tour
+# Learn Web
 
 Teach a web app by walking the user through it live in their browser, one stop at a time:
 

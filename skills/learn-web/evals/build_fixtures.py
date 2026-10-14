@@ -349,5 +349,5 @@ if __name__ == "__main__":
         # The readable expectations are the checker's own wording, so the two cannot drift.
         state = json.loads((HERE / entry["files"][0].removeprefix("evals/") / "browser.json").read_text())
         entry["expectations"] = [e["text"] for e in check.grade(entry["check"], state, "")]
-    (HERE / "evals.json").write_text(json.dumps({"skill_name": "guided-tour", "evals": evals}, indent=2, ensure_ascii=False) + "\n")
+    (HERE / "evals.json").write_text(json.dumps({"skill_name": "learn-web", "evals": evals}, indent=2, ensure_ascii=False) + "\n")
     print(f"{len(evals)} scenarios written, {sum(len(e['expectations']) for e in evals)} expectations")

@@ -1,4 +1,4 @@
-"""The guided-tour evals: the mock browser records honestly, and the checker cannot be passed by accident."""
+"""The learn-web evals: the mock browser records honestly, and the checker cannot be passed by accident."""
 import importlib.util
 import json
 import os
@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-EVALS = ROOT / "skills" / "guided-tour" / "evals"
-SPOTLIGHT = (ROOT / "skills" / "guided-tour" / "scripts" / "spotlight.js").read_text()
+EVALS = ROOT / "skills" / "learn-web" / "evals"
+SPOTLIGHT = (ROOT / "skills" / "learn-web" / "scripts" / "spotlight.js").read_text()
 
 
 def load(name, path):
@@ -25,7 +25,7 @@ SCENARIOS = json.loads((EVALS / "evals.json").read_text())["evals"]
 
 
 def fixture(entry):
-    return json.loads((ROOT / "skills" / "guided-tour" / entry["files"][0] / "browser.json").read_text())
+    return json.loads((ROOT / "skills" / "learn-web" / entry["files"][0] / "browser.json").read_text())
 
 
 class Browser:
@@ -69,7 +69,7 @@ def test_an_agent_that_does_nothing_never_gets_full_marks(entry):
 def test_the_agent_never_sees_the_grading_details():
     """Fixture folders are copied into the agent's sandbox; the answers must not be in them."""
     for entry in SCENARIOS:
-        folder = ROOT / "skills" / "guided-tour" / entry["files"][0]
+        folder = ROOT / "skills" / "learn-web" / entry["files"][0]
         assert sorted(p.name for p in folder.iterdir()) in (["browser.json"], ["browser.json", "transcript.md"])
         for secret in entry["check"].get("secrets", []):
             assert secret not in (folder / "browser.json").read_text()

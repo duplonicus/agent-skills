@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic grading for the guided-tour evals.
+"""Deterministic grading for the learn-web evals.
 
 Usage: check.py <eval-name> <fixture-dir> <run-dir> <skill-dir>
 

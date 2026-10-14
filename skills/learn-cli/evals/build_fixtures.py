@@ -311,5 +311,5 @@ if __name__ == "__main__":
     for entry in evals:
         # The readable expectations are the checker's own wording, so the two cannot drift.
         entry["expectations"] = [e["text"] for e in check.grade(entry["check"], {"events": []}, "", "", "")]
-    (HERE / "evals.json").write_text(json.dumps({"skill_name": "claude-tui-study-buddy", "evals": evals}, indent=2, ensure_ascii=False) + "\n")
+    (HERE / "evals.json").write_text(json.dumps({"skill_name": "learn-cli", "evals": evals}, indent=2, ensure_ascii=False) + "\n")
     print(f"{len(evals)} scenarios written, {sum(len(e['expectations']) for e in evals)} expectations")

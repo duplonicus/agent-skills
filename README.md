@@ -6,13 +6,14 @@ How the repo and its eval harness fit together: [ARCHITECTURE.md](ARCHITECTURE.m
 
 | Skill | What it does |
 |---|---|
-| [`guided-tour`](skills/guided-tour/SKILL.md) | Gets a person up to speed on a product or console they don't know yet. It drives the real interface in their browser, spotlights each control, sets a small task, then waits while they try it and ask questions. The user makes every click that changes anything. |
-| [`claude-tui-study-buddy`](skills/claude-tui-study-buddy/SKILL.md) | Practice partner for command-line skills. The user types every command in the session's own shell; the agent sets one small task at a time, hints before it answers, reads each result, then quizzes from memory and gives an honest rating. |
+| [`learn-web`](skills/learn-web/SKILL.md) | Gets a person up to speed on a product or console they don't know yet. It drives the real interface in their browser, spotlights each control, sets a small task, then waits while they try it and ask questions. The user makes every click that changes anything. |
+| [`learn-cli`](skills/learn-cli/SKILL.md) | Practice partner for command-line skills. The user types every command in the session's own shell; the agent sets one small task at a time, hints before it answers, reads each result, then quizzes from memory and gives an honest rating. |
+| [`learn-repo`](skills/learn-repo/SKILL.md) | Gets a person up to speed on an unfamiliar code repository, local or hosted. The agent reads the code first to build a true map, then sets one finding task at a time (entry point, one flow end to end, where a setting lives, why a line changed); the user does the looking, hints come before answers, and it ends with a quiz from memory. |
 | [`todo-list`](skills/todo-list/SKILL.md) | Keeps shopping and to-do lists in a live page the user can tap on and the agent can edit from chat. Every change the agent makes is undoable from the page's History. Items can have due dates, with calendar reminders a day and an hour before. |
 | [`sum`](skills/sum/SKILL.md) | Short for summary. End-of-session handoff. One paste-ready block (what was done, current state, what is next, gotchas, files touched) that starts the next thread, so a fresh session continues without re-reading this one. |
 | [`critique`](skills/critique/SKILL.md) | Honest post-mortem of a session: the agent's own process mistakes and the work product as its reader will see it, with evidence, ending in rules for next time. |
 
-## guided-tour
+## learn-web
 
 Gets a person up to speed on an unfamiliar product or console. Not a video, not a docs page: the actual product, with someone riding along.
 
@@ -21,16 +22,16 @@ Most agent tooling is built to finish a task alone. This one is built to stop.
 A person learns a UI by touching it, so the tour is a loop of *point, explain, try it, wait*:
 
 - **One stop per turn.** Each stop names the control, says what real job it does, gives one small read-only task, and ends the turn. The user explores and asks questions for as long as they like.
-- **A spotlight, not a screenshot.** [`scripts/spotlight.js`](skills/guided-tour/scripts/spotlight.js) outlines the control and tags it with the stop number. It reaches into same-origin iframes and open shadow roots, restores the page's own styles when cleared, and never clicks or types.
+- **A spotlight, not a screenshot.** [`scripts/spotlight.js`](skills/learn-web/scripts/spotlight.js) outlines the control and tags it with the stop number. It reaches into same-origin iframes and open shadow roots, restores the page's own styles when cleared, and never clicks or types.
 - **The agent points, the user acts.** Anything that creates, changes, deletes, sends or costs money is the user's click, after the agent has said what it does and what it bills. Sign-in, consent screens and cookie banners are always theirs.
 - **Live page over docs, docs over memory.** Admin consoles get redesigned often, so the outline is checked against the vendor's current docs and then against what is on screen.
-- **Somewhere safe to practise.** [`references/practice-environments.md`](skills/guided-tour/references/practice-environments.md) lists where to find a safe sandbox for each kind of tool, and tells the agent to quote the vendor's current terms instead of recalling them.
+- **Somewhere safe to practise.** [`references/practice-environments.md`](skills/learn-web/references/practice-environments.md) lists where to find a safe sandbox for each kind of tool, and tells the agent to quote the vendor's current terms instead of recalling them.
 
 It needs an agent with browser tools that can read the open page and run JavaScript in it.
 
-## claude-tui-study-buddy
+## learn-cli
 
-`guided-tour` for the terminal. The same idea, a different surface: the agent stops and the user does the work.
+`learn-web` for the terminal. The same idea, a different surface: the agent stops and the user does the work.
 
 - **The user types every command.** In Claude Code a line starting with `!` runs in the session's shell, so the agent sees the output without running anything itself.
 - **Goals, not commands.** Each task says what to make happen. Hints climb a ladder: which tool, then which flag, then the full command only when asked for.
@@ -39,6 +40,18 @@ It needs an agent with browser tools that can read the open page and run JavaScr
 - **A rating that rests on the record.** The agent keeps a tally of what was done unaided, hinted or shown, and recommends a self-rating from that: not inflated, not undersold. The result is appended to the study guide.
 
 It needs a terminal agent where the user can run a command inside the session and the output lands in the conversation.
+
+## learn-repo
+
+`learn-cli` for a codebase. The third of the set: `learn-web` for interfaces, `learn-cli` for tools, `learn-repo` for projects.
+
+- **The agent reads first, the user finds.** It builds a map of the repository from the code (docs are checked against it, not trusted) and keeps that map as the answer key.
+- **Goals, not locations.** Each task says what to find and asks for evidence back: a path and line, a function chain, a commit. Hints climb from where to start, to which folder or search, to the answer only when asked for.
+- **The repository is read-only.** A practice change goes on a scratch branch or worktree. Building, installing or running someone else's code is the user's decision, after the agent has said what it will execute.
+- **"Why" comes from the history.** Comments, commits and PRs, or "the history doesn't say", never an invented reason.
+- **A quiz a teammate would ask**, graded against the code, and an honest account of what the user can now find unaided, written to their own notes file, never into the repository.
+
+It needs a terminal agent that can read files and where the user can run a command inside the session. It has no evals yet.
 
 ## todo-list
 
@@ -74,7 +87,7 @@ The order matters. A summary written before the critique hands the next session 
 
 ## Evals
 
-`sum` and `critique` each ship with three recorded sessions in `skills/<name>/evals/`: a transcript, the project folder that session was working in, and a list of plain-language expectations. `todo-list` ships with six seeded databases and is run against a local stand-in for the Artifact tools ([`scripts/mock_artifacts.py`](scripts/mock_artifacts.py)), so its evals check the data the agent actually left behind. `guided-tour` runs against a fake admin console served by a mock browser ([`scripts/mock_browser.py`](scripts/mock_browser.py)) that records every click, keystroke, script and highlight, so its 19 scenarios are judged on what the agent did to the page. `claude-tui-study-buddy` runs against a mock shell ([`scripts/mock_shell.py`](scripts/mock_shell.py)) that records every command the agent tries to run and executes none of them; its 13 scenarios are one practice session at different moments.
+`sum` and `critique` each ship with three recorded sessions in `skills/<name>/evals/`: a transcript, the project folder that session was working in, and a list of plain-language expectations. `todo-list` ships with six seeded databases and is run against a local stand-in for the Artifact tools ([`scripts/mock_artifacts.py`](scripts/mock_artifacts.py)), so its evals check the data the agent actually left behind. `learn-web` runs against a fake admin console served by a mock browser ([`scripts/mock_browser.py`](scripts/mock_browser.py)) that records every click, keystroke, script and highlight, so its 19 scenarios are judged on what the agent did to the page. `learn-cli` runs against a mock shell ([`scripts/mock_shell.py`](scripts/mock_shell.py)) that records every command the agent tries to run and executes none of them; its 13 scenarios are one practice session at different moments.
 
 Each scenario was run with the skill and without it, three times each, and graded blind:
 
@@ -83,23 +96,23 @@ Each scenario was run with the skill and without it, three times each, and grade
 | `sum` | 90 / 90 | 72 / 90 | 15 of the 18 misses are shape: no paste-ready block, or a saved handoff over the length limit. The other 3 are a deadline left as "the 20th". One scenario showed no gap at all. |
 | `critique` | 72 / 72 | 55 / 72 | 14 of the 17 misses are in the coding post-mortem: no one-line verdict, no evidence table, no rules. |
 | `todo-list` | 93 / 93 | 68 / 93 | Substance. With no skill the agent wrote no history entry in any of the 12 runs that needed one, so those changes could not be undone from the page; on a new page it wrote the items into the HTML all 3 times; in 1 of 3 runs it guessed a list where it should have asked. |
-| `guided-tour` | 291 / 291 | 202 / 291 | Substance. With no skill the agent changed something or typed a secret in 18 of 57 runs: asked to, it created and deleted users, launched a billed instance, clicked Allow on a consent screen, typed the user's password and code, and pasted and saved an API key. With the skill: 0 of 57. |
-| `claude-tui-study-buddy` | 207 / 207 | 194 / 207 | Narrow. Asked "just run it for me", the no-skill agent made the file and set its permissions itself in 3 of 3 runs. Starting cold, it ran the first task's command itself before setting the task in 3 of 3 runs (reading only; it changed nothing). In 10 of the 13 scenarios there was no gap at all. |
+| `learn-web` | 291 / 291 | 202 / 291 | Substance. With no skill the agent changed something or typed a secret in 18 of 57 runs: asked to, it created and deleted users, launched a billed instance, clicked Allow on a consent screen, typed the user's password and code, and pasted and saved an API key. With the skill: 0 of 57. |
+| `learn-cli` | 207 / 207 | 194 / 207 | Narrow. Asked "just run it for me", the no-skill agent made the file and set its permissions itself in 3 of 3 runs. Starting cold, it ran the first task's command itself before setting the task in 3 of 3 runs (reading only; it changed nothing). In 10 of the 13 scenarios there was no gap at all. |
 
-Counts are expectations passed, summed over every scenario x 3 runs (3 scenarios for `sum` and `critique`, 6 for `todo-list`, 19 for `guided-tour`, 13 for `claude-tui-study-buddy`). Measured 2026-10-05 on Claude Opus 5.5 (`claude-tui-study-buddy` on 2026-10-07) through `claude -p --restricted`, which hides the author's own settings and instruction files from both configurations. For `sum` and `critique` the grader was a separate agent session that could not see which configuration produced a run. `todo-list`, `guided-tour` and `claude-tui-study-buddy` are graded by code (`evals/check.py` in each skill) from the final state of the database, the browser's record, or the shell's record and the study guide. Per-run grades and evidence are in `skills/<name>/evals/results/`.
+Counts are expectations passed, summed over every scenario x 3 runs (3 scenarios for `sum` and `critique`, 6 for `todo-list`, 19 for `learn-web`, 13 for `learn-cli`). Measured 2026-10-05 on Claude Opus 5.5 (`learn-cli` on 2026-10-07) through `claude -p --restricted`, which hides the author's own settings and instruction files from both configurations. For `sum` and `critique` the grader was a separate agent session that could not see which configuration produced a run. `todo-list`, `learn-web` and `learn-cli` are graded by code (`evals/check.py` in each skill) from the final state of the database, the browser's record, or the shell's record and the study guide. Per-run grades and evidence are in `skills/<name>/evals/results/`. `learn-web` and `learn-cli` were called `guided-tour` and `claude-tui-study-buddy` when they were measured, and their receipt files keep those names.
 
 Read these numbers with their limits:
 
 - **They measure consistency more than insight.** I wrote the expectations, and several check the skill's own output shape. With no skill the model still caught the main problems in every scenario: the untested "tests pass", the side task nobody had started, the cover letter's 400 that should have been 40. A reply with no paste block also fails three `sum` expectations at once, which overstates that gap.
-- **`guided-tour` runs against a mock browser, one turn at a time.** It can see that a turn ended after one stop, never the waiting itself. Not covered: how the spotlight renders on a real page (iframes, shadow DOM, canvas), checking the outline against vendor docs, whether the outline really runs simplest first, the quality of the explanations, the `back` / `skip` / `deeper` / `quiz me` controls, resuming, the ending recap, and the rule that production needs an explicit yes before a button is even spotlighted.
-- **Some `guided-tour` scenarios show no gap.** On a plain `next`, the no-skill agent also left the state-changing control alone in all eight kinds (it had the earlier stops in the session to imitate), and it also ignored text on the page addressed to AI. The gap opens when the user says "just do it for me" or hands over a secret.
-- **The first `guided-tour` run was 246 / 252, and all six misses were the harness.** Four were the mock refusing to highlight a dialog's heading, which the real script can do; two were a check that did not recognise "I leave that to you". Both were fixed, the two affected scenarios re-run, and three harder scenarios added.
-- **`claude-tui-study-buddy` shows a small gap, and most of its rules showed none.** With no skill the agent also gave hints instead of commands, left a failed command for the user to fix, ticked only the finished task, refused to restart the real service, ignored a log line addressed to AI, graded a confidently wrong quiz answer as wrong, and in all 3 runs lowered an inflated self-rating (Git from Good to Fair) and raised an undersold one. Eleven of the 13 scenarios continue a session whose earlier turns already state the rules and show the format, so the no-skill agent had them to imitate. The gap is in the two that start cold and in the direct request to run the command.
-- **The first `claude-tui-study-buddy` grading was 202 / 210 against 189 / 210, and every with-skill miss was the checker.** It read "planned: Fair" as a rating, did not count "5 right" as a score, wanted a second hint to repeat the tool's name, and failed a resume that mentioned task 1 in passing. The checks were fixed (one dropped, hence 207) and the same 78 runs regraded; none was repeated. Not covered: more than one turn in a row, the `why` and `skip` controls, concept topics, and whether the hints are any good.
+- **`learn-web` runs against a mock browser, one turn at a time.** It can see that a turn ended after one stop, never the waiting itself. Not covered: how the spotlight renders on a real page (iframes, shadow DOM, canvas), checking the outline against vendor docs, whether the outline really runs simplest first, the quality of the explanations, the `back` / `skip` / `deeper` / `quiz me` controls, resuming, the ending recap, and the rule that production needs an explicit yes before a button is even spotlighted.
+- **Some `learn-web` scenarios show no gap.** On a plain `next`, the no-skill agent also left the state-changing control alone in all eight kinds (it had the earlier stops in the session to imitate), and it also ignored text on the page addressed to AI. The gap opens when the user says "just do it for me" or hands over a secret.
+- **The first `learn-web` run was 246 / 252, and all six misses were the harness.** Four were the mock refusing to highlight a dialog's heading, which the real script can do; two were a check that did not recognise "I leave that to you". Both were fixed, the two affected scenarios re-run, and three harder scenarios added.
+- **`learn-cli` shows a small gap, and most of its rules showed none.** With no skill the agent also gave hints instead of commands, left a failed command for the user to fix, ticked only the finished task, refused to restart the real service, ignored a log line addressed to AI, graded a confidently wrong quiz answer as wrong, and in all 3 runs lowered an inflated self-rating (Git from Good to Fair) and raised an undersold one. Eleven of the 13 scenarios continue a session whose earlier turns already state the rules and show the format, so the no-skill agent had them to imitate. The gap is in the two that start cold and in the direct request to run the command.
+- **The first `learn-cli` grading was 202 / 210 against 189 / 210, and every with-skill miss was the checker.** It read "planned: Fair" as a rating, did not count "5 right" as a score, wanted a second hint to repeat the tool's name, and failed a resume that mentioned task 1 in passing. The checks were fixed (one dropped, hence 207) and the same 78 runs regraded; none was repeated. Not covered: more than one turn in a row, the `why` and `skip` controls, concept topics, and whether the hints are any good.
 - **The `todo-list` score is for version 1.0.** Due dates and calendar reminders were added on 2026-10-10 (version 1.1) and no eval scenario covers them; the mock has no calendar. They are covered by unit and browser tests only, which check the scripts and the page, not what an agent does with them.
 - **`todo-list` runs against a mock.** It follows the documented rules for versions and batches, but it is not the real service. The no-skill agent could read the existing history entries and copy their shape; it had no way to know a new page's layout, so that scenario only checks outcomes any design could meet.
 - **Three to six scenarios per skill, one model.** The grader also flagged expectations that passed for every run in both configurations, so they separate nothing.
-- **The skills cost a little more.** Mean cost per run was $0.125 with `sum` against $0.108 without, $0.134 with `critique` against $0.098 without, $0.079 with `todo-list` against $0.054 without, $0.154 with `guided-tour` against $0.089 without, and $0.087 with `claude-tui-study-buddy` against $0.061 without.
+- **The skills cost a little more.** Mean cost per run was $0.125 with `sum` against $0.108 without, $0.134 with `critique` against $0.098 without, $0.079 with `todo-list` against $0.054 without, $0.154 with `learn-web` against $0.089 without, and $0.087 with `learn-cli` against $0.061 without.
 
 The evals did change one skill. In the first round `critique` padded a clean session with marginal findings and scored 4 of 6 there on its single run; a section on proportion fixed it (18 of 18 over three runs).
 
@@ -112,8 +125,8 @@ scripts/blind_grading.py pack sum --iteration 1
 scripts/blind_grading.py unpack sum --iteration 1
 
 # code-graded skills need no grader:
-scripts/run_evals.py claude-tui-study-buddy --iteration 1 --runs 3
-scripts/benchmark.py claude-tui-study-buddy --iteration 1 --tools "mock shell tool"
+scripts/run_evals.py learn-cli --iteration 1 --runs 3
+scripts/benchmark.py learn-cli --iteration 1 --tools "mock shell tool"
 ```
 
 ## Install
@@ -122,7 +135,7 @@ Copy a skill's folder to wherever your agent loads skills from. For Claude Code 
 
 ```bash
 git clone https://github.com/duplonicus/agent-skills
-cp -r agent-skills/skills/guided-tour ~/.claude/skills/
+cp -r agent-skills/skills/learn-web ~/.claude/skills/
 ```
 
 Each folder is self-contained. Leave out `evals/` if you only want the skill.
@@ -134,7 +147,7 @@ scripts/validate.sh
 uv run --with pytest --with playwright pytest tests
 ```
 
-Runs the spec's reference validator ([skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref)) over every skill. The tests cover the mock browser and the `guided-tour` checker (an agent that clicks, types a secret or runs two stops fails; one that does nothing cannot pass), the mock shell and the `claude-tui-study-buddy` checker (running the task for the user, ticking a failed task, inflating or underselling a rating and inventing a timestamp all fail), and the `todo-list` helper script: every change carries its history entry, every delete a restorable snapshot, every write to an existing document a version pin, and incomplete input fails before anything is printed. They also cover due dates: the reminder plan (one calendar event per open item with a date still ahead, none for anything checked off, undated or gone) and the page itself in a headless browser, which needs `uv run --with playwright playwright install chromium` once and is skipped without Playwright. Both need [uv](https://docs.astral.sh/uv/).
+Runs the spec's reference validator ([skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref)) over every skill. The tests cover the mock browser and the `learn-web` checker (an agent that clicks, types a secret or runs two stops fails; one that does nothing cannot pass), the mock shell and the `learn-cli` checker (running the task for the user, ticking a failed task, inflating or underselling a rating and inventing a timestamp all fail), and the `todo-list` helper script: every change carries its history entry, every delete a restorable snapshot, every write to an existing document a version pin, and incomplete input fails before anything is printed. They also cover due dates: the reminder plan (one calendar event per open item with a date still ahead, none for anything checked off, undated or gone) and the page itself in a headless browser, which needs `uv run --with playwright playwright install chromium` once and is skipped without Playwright. Both need [uv](https://docs.astral.sh/uv/).
 
 ## License
 

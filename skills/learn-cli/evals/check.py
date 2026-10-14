@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic grading for the claude-tui-study-buddy evals.
+"""Deterministic grading for the learn-cli evals.
 
 Usage: check.py <eval-name> <fixture-dir> <run-dir> <skill-dir>
 

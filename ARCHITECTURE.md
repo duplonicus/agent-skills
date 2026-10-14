@@ -42,11 +42,11 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 | Path | What it is |
 |---|---|
 | `skills/<name>/SKILL.md` | The skill: front matter (name, description, license, metadata) and the instructions |
-| `skills/<name>/scripts/`, `references/`, `assets/` | Files the skill tells the agent to use. Only `guided-tour` and `todo-list` have them |
+| `skills/<name>/scripts/`, `references/`, `assets/` | Files the skill tells the agent to use. Only `learn-web` and `todo-list` have them |
 | `skills/<name>/evals/evals.json` | The scenarios: prompt, fixture folder, expectations |
 | `skills/<name>/evals/files/<scenario>/` | One fixture per scenario |
-| `skills/<name>/evals/check.py` | Code grader. Present for `todo-list`, `guided-tour`, `claude-tui-study-buddy` |
-| `skills/<name>/evals/build_fixtures.py` | Generates the fixtures and `evals.json`. Present for `guided-tour` and `claude-tui-study-buddy` |
+| `skills/<name>/evals/check.py` | Code grader. Present for `todo-list`, `learn-web`, `learn-cli` |
+| `skills/<name>/evals/build_fixtures.py` | Generates the fixtures and `evals.json`. Present for `learn-web` and `learn-cli` |
 | `skills/<name>/evals/results/` | Committed receipts: every run's grade and evidence |
 | `skills/<name>-workspace/` | Raw run output. Gitignored |
 | `scripts/run_evals.py` | The eval runner |
@@ -67,7 +67,7 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 | Mock tools | MCP over stdio, hand-written JSON-RPC loop | Each mock is one file with no MCP library |
 | Tests | pytest, run through `uv run --with pytest` | 120 tests as of 2026-10-09 |
 | Validation | `skills-ref`, run through `uvx` | The spec's reference validator |
-| `guided-tour` helper | One JavaScript file, `spotlight.js` | Pasted into the browser's JavaScript tool |
+| `learn-web` helper | One JavaScript file, `spotlight.js` | Pasted into the browser's JavaScript tool |
 | `todo-list` page | One HTML file, `assets/todo-list.html` | Loads SortableJS from a CDN; data comes from the Artifact database; calendar reminders go through the viewer's Google Calendar connector (the `mcp` capability), when the page was published with it |
 
 ## The skills
@@ -77,12 +77,13 @@ Nothing here is a running service. Every arrow is a script the author starts by 
 | `sum` | none | none | 3 | blind grader |
 | `critique` | none | none | 3 | blind grader |
 | `todo-list` | `scripts/writes.py`, `scripts/reminders.py`, `references/schema.md`, `assets/todo-list.html` | Artifact and ArtifactData | 6 | `check.py` |
-| `guided-tour` | `scripts/spotlight.js`, `references/practice-environments.md` | Browser tools that read the page and run JavaScript | 19 | `check.py` |
-| `claude-tui-study-buddy` | none | A terminal session where the user runs commands | 13 | `check.py` |
+| `learn-web` | `scripts/spotlight.js`, `references/practice-environments.md` | Browser tools that read the page and run JavaScript | 19 | `check.py` |
+| `learn-cli` | none | A terminal session where the user runs commands | 13 | `check.py` |
+| `learn-repo` | none | A terminal session where the user runs commands; reads the repository itself | none yet | none yet |
 
 Two of the skills carry code that does real work:
 
-**`spotlight.js` (guided-tour).** The agent replaces two placeholders (the target text and a tag label) and runs it in the page.
+**`spotlight.js` (learn-web).** The agent replaces two placeholders (the target text and a tag label) and runs it in the page.
 
 1. It collects every document it can reach: the page, same-origin iframes, open shadow roots.
 2. It clears any earlier highlight and puts back each element's original outline.
@@ -177,8 +178,8 @@ There are two paths. The run folder ends up with the same `grading.json` shape e
 | Skill | What the checker reads | How scenarios map to checks |
 |---|---|---|
 | `todo-list` | Database before and after, the list of tool calls, the reply | One function per scenario (6) |
-| `guided-tour` | The browser's event record, the reply | 7 check kinds shared by 19 scenarios; each scenario's `check` block in `evals.json` picks the kind and its parameters |
-| `claude-tui-study-buddy` | The shell's command record, the study guide before and after, the reply | 11 check kinds shared by 13 scenarios, picked the same way |
+| `learn-web` | The browser's event record, the reply | 7 check kinds shared by 19 scenarios; each scenario's `check` block in `evals.json` picks the kind and its parameters |
+| `learn-cli` | The shell's command record, the study guide before and after, the reply | 11 check kinds shared by 13 scenarios, picked the same way |
 
 The expectation text in `evals.json` is the checker's own wording. Tests fail if the two drift.
 
@@ -196,7 +197,7 @@ The shuffle is seeded with the skill name and iteration number, so the same pack
 
 `scripts/benchmark.py` reads every graded run of an iteration and writes `skills/<name>/evals/results/<date>-benchmark.json`: each run's grade, evidence, time, tokens and cost, plus totals per configuration. It refuses to write if any scenario has a different number of runs from the others.
 
-Only the `claude-tui-study-buddy` receipts have the exact shape `benchmark.py` writes. The other four files carry a `delta` block and no pass totals in their summary; the per-run grades and evidence are in the same form.
+Only the `learn-cli` receipts have the exact shape `benchmark.py` writes. The other four files carry a `delta` block and no pass totals in their summary; the per-run grades and evidence are in the same form.
 
 Results as of the committed receipts (expectations passed, all scenarios x 3 runs, Claude Opus 5.5):
 
@@ -205,8 +206,8 @@ Results as of the committed receipts (expectations passed, all scenarios x 3 run
 | `sum` | 90 / 90 | 72 / 90 | 2026-10-05 | `skills/sum/evals/results/` |
 | `critique` | 72 / 72 | 55 / 72 | 2026-10-05 | `skills/critique/evals/results/` |
 | `todo-list` | 93 / 93 | 68 / 93 | 2026-10-05 | `skills/todo-list/evals/results/` |
-| `guided-tour` | 291 / 291 | 202 / 291 | 2026-10-05 | `skills/guided-tour/evals/results/` |
-| `claude-tui-study-buddy` | 207 / 207 | 194 / 207 | 2026-10-07 | `skills/claude-tui-study-buddy/evals/results/` |
+| `learn-web` | 291 / 291 | 202 / 291 | 2026-10-05 | `skills/learn-web/evals/results/` |
+| `learn-cli` | 207 / 207 | 194 / 207 | 2026-10-07 | `skills/learn-cli/evals/results/` |
 
 The README's Evals section says where each gap is and how far these numbers can be trusted.
 
@@ -288,8 +289,8 @@ The page subscribes to all three and redraws when any of them changes. It is pub
 | `test_todo_reminders.py` | The reminder plan: one event per open item with a date still ahead, at the stated times with both reminders; updates for a moved date; deletes for anything checked off, undated or gone |
 | `test_todo_page.py` | The page in headless Chromium against an in-memory database with the clock pinned: badge wording and urgency, the writes the page makes, that a due date never moves an item, badge colours in both themes; the page's own calendar reminders against a stand-in connector (every create, move and delete, each failure code, undo races, and that the page and `reminders.py` plan the same event). Skipped when Playwright is not installed |
 | `test_evals_consistent.py` | `todo-list` expectations match the checker's wording; a run that does nothing fails every scenario |
-| `test_guided_tour_evals.py` | The browser mock and checker: a click, a script click, a typed secret, a followed injection and a second stop each fail; a do-nothing run never gets full marks; fixture folders hold only the app and the transcript, and none of the secrets the checker looks for; stored results cover every scenario |
-| `test_study_buddy_evals.py` | The shell mock and checker: state-changing commands are caught, read-only ones are not; running the task, ticking a failed task, a wrong rating and an invented time each fail; stored results match the current checks |
+| `test_learn_web_evals.py` | The browser mock and checker: a click, a script click, a typed secret, a followed injection and a second stop each fail; a do-nothing run never gets full marks; fixture folders hold only the app and the transcript, and none of the secrets the checker looks for; stored results cover every scenario |
+| `test_learn_cli_evals.py` | The shell mock and checker: state-changing commands are caught, read-only ones are not; running the task, ticking a failed task, a wrong rating and an invented time each fail; stored results match the current checks |
 | `test_run_evals_resume.py` | A finished run is skipped without calling the agent; a half-finished one is redone from scratch; `--force` redoes a finished one |
 
 `scripts/validate.sh` runs `skills-ref` over each folder under `skills/` that has a `SKILL.md`.
@@ -301,7 +302,7 @@ There is no build and no deploy.
 1. A skill is installed by copying its folder to wherever the agent loads skills from. `evals/` can be left out.
 2. The pre-commit hook is turned on once per clone with `git config core.hooksPath .githooks`.
 3. There is no CI workflow in the repo. Validation and tests are run by hand.
-4. Fixtures for `guided-tour` and `claude-tui-study-buddy` are generated: edit `build_fixtures.py`, run it, commit the output.
+4. Fixtures for `learn-web` and `learn-cli` are generated: edit `build_fixtures.py`, run it, commit the output.
 
 ## Key decisions and their cost
 
@@ -325,7 +326,7 @@ There is no build and no deploy.
 - Every scenario is one turn. The harness sees that a turn ended, not what the agent does on the next one.
 - Triggering is not tested: the agent is told the skill applies.
 - One model, three runs per scenario, 3 to 19 scenarios per skill.
-- Most `guided-tour` and `claude-tui-study-buddy` scenarios continue a transcript, so the no-skill agent has earlier turns to imitate.
+- Most `learn-web` and `learn-cli` scenarios continue a transcript, so the no-skill agent has earlier turns to imitate.
 - `spotlight.js` is never executed in the evals. The browser mock recognises it and answers as it would.
 - The artifacts mock supports two query operators and does not model access rules.
 - The shell mock answers exit 0 to anything unscripted, so a command the fixture did not expect looks like it worked.
