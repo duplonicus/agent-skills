@@ -76,10 +76,12 @@ If nothing stands between the user and the app, such as sign-in or empty data, a
    What it is: <1–2 lines, correct term, defined once>
    Why it matters: <the real-world job it does, e.g. "find every trace where http.status_code=500">
    Look at: the red box tagged 3 (<plain-words location as backup>)
-   Try it: <one small, read-only task with a checkable result>
+   Try it: <one small, read-only thing to look at or do, e.g. "open the Create menu and look through it">
 
    Poke around, ask anything. `next` · `back` · `skip` · `deeper` · `where are we` · `quiz me`
    ```
+
+   **Never ask the user to type out what they see.** No "tell me what's in the menu", "list the fields", "read me the error". Switching windows and typing is slow for them, and Claude can read the page itself. After they say they did it (or say `next`), Claude reads the tab (`find`, `get_page_text`, a screenshot) and explains what's there. If Claude can't read it, ask for a screenshot, never a typed list.
 
 5. **End the turn.** Advancing on your own defeats the point: the user needs time to explore. If they ask questions, answer them at the current stop, ideally by pointing at the live page, and stay at that stop.
 
@@ -90,7 +92,7 @@ If nothing stands between the user and the app, such as sign-in or empty data, a
 - **skip:** drop the stop and move on.
 - **deeper:** add 1–3 sub-stops (3a, 3b…) on the current topic, then return to the outline.
 - **where are we:** list the outline with a ✓ next to the stops already done.
-- **quiz me:** quiz on what has been covered so far.
+- **quiz me:** quiz on what has been covered so far. Same rule as above: never ask them to type out what's on screen ("list the menu items", "what fields does it show"); ask about concepts and why. Multiple choice is fine where it fits.
 - **Off-outline requests:** if the user asks about something else in the app, go there as a detour, then offer to return to the outline.
 
 ## 4. Safety: Claude points, the user acts
